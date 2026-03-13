@@ -10,6 +10,7 @@ import Invoice from '../components/Invoice';
 import { toast } from 'react-hot-toast';
 import { FaTruckMoving } from 'react-icons/fa';
 import { useCart } from '../../cart/context/CartContext';
+import { API_BASE_URL } from '../../../shared/constants/api';
 import './Orders.css';
 
 const Orders = () => {
@@ -59,7 +60,7 @@ const Orders = () => {
         if (!reviewData.comment.trim()) return toast.error('Please write a comment.');
         try {
             const productId = reviewModal.item.productId || reviewModal.item.id;
-            const res = await fetch(`http://localhost:5000/api/reviews/${productId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/reviews/${productId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -88,12 +89,18 @@ const Orders = () => {
         setSelectedInvoice(order);
     };
 
-    const handleReturnOrder = (orderId) => {
-        const confirmReturn = window.confirm("Are you sure you want to request a return for this order?");
-        if (confirmReturn) {
-            updateOrderStatus(orderId, "Return Requested");
-            toast.success("Return request sent successfully!");
-        }
+    const handleReturnOrder = (order) => {
+        setReturnExchangeModal(order);
+        setReturnExchangeType('return');
+        setReturnReason('');
+    };
+
+    const handleConfirmReturnExchange = () => {
+        if (!returnReason) return toast.error('Please select a reason.');
+        const status = returnExchangeType === 'exchange' ? 'Exchange Requested' : 'Return Requested';
+        updateOrderStatus(returnExchangeModal.id || returnExchangeModal._id, status, returnReason);
+        setReturnExchangeModal(null);
+        toast.success(`${returnExchangeType === 'exchange' ? 'Exchange' : 'Return'} request submitted! We will contact you within 24 hours.`);
     };
 
     const handleCancelOrder = (order) => {
@@ -173,7 +180,7 @@ const Orders = () => {
                     <div className="amz-orders-list">
                         {filteredOrders.map(order => {
                             const isDelivered = order.status === 'Delivered';
-                            const statuses = ["Pending", "Processing", "Shipped", "In Transit", "Delivering", "Delivered", "Return Requested", "Returned"];
+                            const statuses = ["Pending", "Processing", "Shipped", "In Transit", "Delivering", "Delivered", "Return Requested", "Exchange Requested", "Returned"];
                             const currentIdx = Math.max(0, statuses.indexOf(order.status));
                             
                             // Support both order.date (local) and order.createdAt (MongoDB)
@@ -338,7 +345,7 @@ const Orders = () => {
                                                     {trackingOrderId === order.id ? 'Hide tracking' : 'Track package'}
                                                 </button>
                                                 {isDelivered && (
-                                                    <button className="amz-action-btn" onClick={() => handleReturnOrder(order.id)}>Return or replace items</button>
+                                                    <button className="amz-action-btn" onClick={() => handleReturnOrder(order)}>Return or replace items</button>
                                                 )}
                                                 <button className="amz-action-btn" onClick={() => handleShareGiftReceipt(order)}>Share gift receipt</button>
                                                 {(order.status === 'Pending' || order.status === 'Processing') && (
@@ -474,6 +481,79 @@ const Orders = () => {
                                     disabled={!cancelReason}
                                 >
                                     Confirm Cancellation
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Return / Exchange Modal */}
+                {returnExchangeModal && (
+                    <div className="amz-modal-overlay" onClick={() => setReturnExchangeModal(null)}>
+                        <div className="amz-modal-content" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
+                            <button className="amz-modal-close" onClick={() => setReturnExchangeModal(null)}>×</button>
+                            <h3 style={{ marginBottom: '0.5rem', color: '#e0e0e0' }}>Return or Replace Items</h3>
+                            <p style={{ fontSize: '13px', color: '#aaa', marginBottom: '1.2rem' }}>
+                                Order #{returnExchangeModal.id || returnExchangeModal._id}
+                            </p>
+
+                            {/* Type Toggle */}
+                            <div style={{ display: 'flex', gap: '10px', marginBottom: '1.2rem' }}>
+                                {['return', 'exchange'].map(type => (
+                                    <button
+                                        key={type}
+                                        onClick={() => { setReturnExchangeType(type); setReturnReason(''); }}
+                                        style={{
+                                            flex: 1, padding: '10px', borderRadius: '6px', cursor: 'pointer',
+                                            background: returnExchangeType === type ? 'var(--amazon-orange, #f90)' : '#1a1a1a',
+                                            color: returnExchangeType === type ? '#000' : '#e0e0e0',
+                                            border: `1px solid ${returnExchangeType === type ? 'var(--amazon-orange, #f90)' : '#444'}`,
+                                            fontWeight: returnExchangeType === type ? '700' : '400',
+                                            fontSize: '14px', textTransform: 'capitalize'
+                                        }}
+                                    >
+                                        {type === 'return' ? '↩ Request Return' : '🔄 Request Exchange'}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Reason Selection */}
+                            <p style={{ fontSize: '13px', color: '#ccc', marginBottom: '0.8rem' }}>
+                                {returnExchangeType === 'return' ? 'Why are you returning this item?' : 'Why do you want to exchange this item?'}
+                            </p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '1.5rem' }}>
+                                {(returnExchangeType === 'return'
+                                    ? ['Item arrived damaged', 'Wrong item received', 'Item not as described', 'Changed my mind', 'Defective / not working', 'Other']
+                                    : ['Received wrong size/variant', 'Item is defective', 'Want a different colour', 'Want a different model', 'Other']
+                                ).map(reason => (
+                                    <label key={reason} style={{
+                                        display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
+                                        background: returnReason === reason ? '#222' : '#1a1a1a',
+                                        border: `1px solid ${returnReason === reason ? 'var(--amazon-orange, #f90)' : '#333'}`,
+                                        borderRadius: '6px', cursor: 'pointer', color: '#e0e0e0', fontSize: '14px'
+                                    }}>
+                                        <input
+                                            type="radio" name="returnReason" value={reason}
+                                            checked={returnReason === reason}
+                                            onChange={() => setReturnReason(reason)}
+                                            style={{ accentColor: 'var(--amazon-orange, #f90)' }}
+                                        />
+                                        {reason}
+                                    </label>
+                                ))}
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button className="amz-btn" style={{ flex: 1, background: '#333' }} onClick={() => setReturnExchangeModal(null)}>
+                                    Go Back
+                                </button>
+                                <button
+                                    className="amz-btn"
+                                    style={{ flex: 1, background: returnExchangeType === 'exchange' ? '#2563eb' : '#dc2626', opacity: returnReason ? 1 : 0.5 }}
+                                    onClick={handleConfirmReturnExchange}
+                                    disabled={!returnReason}
+                                >
+                                    Confirm {returnExchangeType === 'exchange' ? 'Exchange' : 'Return'}
                                 </button>
                             </div>
                         </div>

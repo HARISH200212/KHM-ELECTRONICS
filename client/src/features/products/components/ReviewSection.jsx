@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaStar, FaUserCircle } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from '../../../shared/constants/api';
 
 const ReviewSection = ({ productId }) => {
     const [reviews, setReviews] = useState([]);
@@ -10,7 +11,7 @@ const ReviewSection = ({ productId }) => {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/reviews/${productId}`);
+                const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}`);
                 if (response.ok) {
                     const data = await response.json();
                     setReviews(data);
@@ -30,7 +31,7 @@ const ReviewSection = ({ productId }) => {
         if (!newReview.comment.trim()) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/reviews/${productId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
