@@ -22,7 +22,7 @@ passport.use(
         {
             clientID: GOOGLE_CLIENT_ID,
             clientSecret: GOOGLE_CLIENT_SECRET,
-            callbackURL: 'http://localhost:5000/api/auth/google/callback', // Using absolute for clarity
+            callbackURL: `${process.env.SERVER_URL || 'http://localhost:5000'}/api/auth/google/callback`,
             scope: ['profile', 'email'],
             proxy: true
         },
@@ -65,7 +65,7 @@ passport.use(
         {
             clientID: process.env.FACEBOOK_APP_ID,
             clientSecret: process.env.FACEBOOK_APP_SECRET,
-            callbackURL: 'http://localhost:5000/api/auth/facebook/callback',
+            callbackURL: `${process.env.SERVER_URL || 'http://localhost:5000'}/api/auth/facebook/callback`,
             profileFields: ['id', 'displayName', 'emails', 'photos'],
             proxy: true
         },
@@ -109,7 +109,7 @@ passport.use(
         {
             consumerKey: process.env.X_CONSUMER_KEY,
             consumerSecret: process.env.X_CONSUMER_SECRET,
-            callbackURL: 'http://localhost:5000/auth/x/callback',
+            callbackURL: `${process.env.SERVER_URL || 'http://localhost:5000'}/api/auth/x/callback`,
             includeEmail: true,
             proxy: true
         },
