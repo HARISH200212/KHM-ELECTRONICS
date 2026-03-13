@@ -59,7 +59,7 @@ const Orders = () => {
         if (!reviewData.comment.trim()) return toast.error('Please write a comment.');
         try {
             const productId = reviewModal.item.productId || reviewModal.item.id;
-            const res = await fetch(`http://localhost:5000/api/reviews/${productId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/reviews/${productId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

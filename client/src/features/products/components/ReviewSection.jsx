@@ -10,7 +10,7 @@ const ReviewSection = ({ productId }) => {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/reviews/${productId}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/reviews/${productId}`);
                 if (response.ok) {
                     const data = await response.json();
                     setReviews(data);
@@ -30,7 +30,7 @@ const ReviewSection = ({ productId }) => {
         if (!newReview.comment.trim()) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/reviews/${productId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/reviews/${productId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
