@@ -30,12 +30,13 @@ import AdminCustomerDetails from './features/admin/pages/AdminCustomerDetails';
 import AuthGuard from './shared/components/routing/AuthGuard';
 import AdminPrivateRoute from './features/admin/components/AdminPrivateRoute';
 import RoamingLogo from './shared/components/ui/RoamingLogo';
+import { API_BASE_URL } from './shared/constants/api';
 
 function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
+    const socket = io(API_BASE_URL);
 
     socket.on('new_product_push', (data) => {
       toast.custom((t) => (

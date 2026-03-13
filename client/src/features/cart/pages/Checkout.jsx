@@ -10,6 +10,7 @@ import io from 'socket.io-client';
 import StripePayment from '../components/StripePayment';
 import PaymentLoader from '../../../shared/components/ui/PaymentLoader';
 import UPIScannerModal from '../components/UPIScannerModal';
+import { API_BASE_URL } from '../../../shared/constants/api';
 import './Checkout.css';
 
 const Checkout = () => {
@@ -46,7 +47,7 @@ const Checkout = () => {
     }, [cartItems, directBuyItem, navigate]);
 
     useEffect(() => {
-        const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
+        const socket = io(API_BASE_URL);
         socket.on('payment_status', (payload) => {
             if (payload?.customerEmail && payload.customerEmail !== formData.email) return;
             setLivePaymentStatus(payload.status || 'idle');
@@ -56,7 +57,7 @@ const Checkout = () => {
 
     const sendPaymentRealtimeStatus = async ({ paymentIntentId, status, metadata = {} }) => {
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/payment/stripe/status-update`, {
+            await fetch(`${API_BASE_URL}/api/payment/stripe/status-update`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

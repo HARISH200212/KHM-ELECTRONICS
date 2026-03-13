@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { generateInvoiceNumber } from '../../../shared/utils/InvoiceGenerator';
+import { API_BASE_URL } from '../../../shared/constants/api';
 
 import { generateMockOrderHistory } from '../mockData';
 
@@ -12,7 +13,7 @@ export const OrderProvider = ({ children }) => {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`);
+            const response = await fetch(`${API_BASE_URL}/api/orders`);
             if (response.ok) {
                 const data = await response.json();
                 setOrders(data);
@@ -38,7 +39,7 @@ export const OrderProvider = ({ children }) => {
                 invoiceGeneratedAt: new Date().toISOString()
             };
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+            const response = await fetch(`${API_BASE_URL}/api/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderPayload)
@@ -61,7 +62,7 @@ export const OrderProvider = ({ children }) => {
         const orderToUpdate = orders.find(o => o.id === id) || {};
         
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/orders/${id}/status`, {
+            await fetch(`${API_BASE_URL}/api/orders/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 

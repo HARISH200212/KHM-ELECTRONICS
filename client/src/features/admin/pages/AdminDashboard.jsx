@@ -12,6 +12,7 @@ import OrderGraph from '../components/OrderGraph';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import io from 'socket.io-client';
+import { API_BASE_URL } from '../../../shared/constants/api';
 import './Admin.css';
 
 const AdminDashboard = () => {
@@ -22,7 +23,7 @@ const AdminDashboard = () => {
     const [paymentEvents, setPaymentEvents] = useState([]);
 
     useEffect(() => {
-        const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
+        const socket = io(API_BASE_URL);
         socket.on('payment_status', (payload) => {
             setPaymentEvents((prev) => [payload, ...prev].slice(0, 8));
         });

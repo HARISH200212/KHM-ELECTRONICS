@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from '../../../shared/constants/api';
 
 const CheckoutForm = ({ amount, customerEmail, onPaymentSuccess, onRealtimeStatus }) => {
     const stripe = useStripe();
@@ -20,7 +21,7 @@ const CheckoutForm = ({ amount, customerEmail, onPaymentSuccess, onRealtimeStatu
 
         // First, create the Payment Intent on the server
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/stripe/create-payment-intent`, {
+            const response = await fetch(`${API_BASE_URL}/api/payment/stripe/create-payment-intent`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ amount, customerEmail }),

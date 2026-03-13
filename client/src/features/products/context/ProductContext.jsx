@@ -1,11 +1,12 @@
 ﻿import { createContext, useState, useContext, useEffect } from 'react';
 import { products as initialProducts } from '../../../data/products';
+import { API_BASE_URL } from '../../../shared/constants/api';
 
 const ProductContext = createContext();
 
 export const useProducts = () => useContext(ProductContext);
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api`;
+const API_URL = `${API_BASE_URL}/api`;
 
 export const ProductProvider = ({ children }) => {
     const [products, setProducts] = useState([]);

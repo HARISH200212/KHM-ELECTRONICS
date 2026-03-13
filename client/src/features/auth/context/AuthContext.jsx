@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from '../../../shared/constants/api';
 
 const AuthContext = createContext();
 
@@ -9,7 +10,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
+    const API_URL = `${API_BASE_URL}/api/auth`;
 
     useEffect(() => {
         const checkAuth = async () => {
