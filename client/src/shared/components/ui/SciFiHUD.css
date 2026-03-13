@@ -1,0 +1,191 @@
+.sci-fi-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+    color: var(--primary);
+    opacity: 0.5;
+    transition: opacity 0.5s ease;
+    filter: brightness(1.2) contrast(1.1);
+}
+
+.details-image:hover .sci-fi-hud,
+.viewer360-stage:hover .sci-fi-hud {
+    opacity: 1;
+}
+
+/* Corners */
+.hud-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--primary);
+    filter: drop-shadow(0 0 5px var(--primary));
+}
+
+.top-left {
+    top: 20px;
+    left: 20px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.top-right {
+    top: 20px;
+    right: 20px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.bottom-left {
+    bottom: 20px;
+    left: 20px;
+    border-right: none;
+    border-top: none;
+}
+
+.bottom-right {
+    bottom: 20px;
+    right: 20px;
+    border-left: none;
+    border-top: none;
+}
+
+/* Rotating Rings */
+.hud-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ring-outer {
+    width: 90%;
+    height: 90%;
+}
+
+.ring-middle {
+    width: 75%;
+    height: 75%;
+}
+
+.ring-inner {
+    width: 60%;
+    height: 60%;
+}
+
+.hud-ring svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 3px var(--primary));
+}
+
+/* Scanner */
+.hud-scanner {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    box-shadow: 0 0 15px var(--primary);
+    z-index: 6;
+}
+
+/* Data Readouts */
+.hud-data {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: 'monospace';
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.data-left {
+    top: 60px;
+    left: 40px;
+}
+
+.data-right {
+    bottom: 60px;
+    right: 40px;
+    text-align: right;
+}
+
+.data-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.data-item .label {
+    color: var(--text-dim);
+    font-size: 8px;
+}
+
+.data-item .value {
+    color: var(--primary);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--primary);
+}
+
+/* Target Reticle */
+.hud-reticle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+}
+
+.reticle-line {
+    position: absolute;
+    background: var(--primary);
+    box-shadow: 0 0 5px var(--primary);
+}
+
+.reticle-line.vert {
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+}
+
+.reticle-line.horiz {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+}
+
+.hud-reticle::before,
+.hud-reticle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid var(--primary);
+    border-radius: 50%;
+}
+
+.hud-reticle::before {
+    width: 10px;
+    height: 10px;
+}
+
+.hud-reticle::after {
+    width: 20px;
+    height: 20px;
+    border-style: dashed;
+}

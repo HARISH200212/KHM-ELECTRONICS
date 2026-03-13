@@ -1,0 +1,218 @@
+.amz-confirmation-page {
+    background-color: var(--amazon-bg);
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+    color: var(--amazon-text-main);
+    padding-bottom: 40px;
+}
+
+.amz-simple-header {
+    background: var(--amazon-elements-bg);
+    border-bottom: 1px solid var(--amazon-border);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+}
+
+.amz-simple-header .amz-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--amazon-text-main);
+    text-decoration: none;
+    letter-spacing: -1px;
+}
+
+.amz-confirmation-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.amz-confirmation-box {
+    background: var(--amazon-elements-bg);
+    border: 1px solid var(--amazon-border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 20px;
+}
+
+/* Common Text */
+.amz-confirmation-box h2 {
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+
+.amz-confirmation-box p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Success Box */
+.success-box {
+    border-top: 3px solid #4ADE80;
+}
+
+.success-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.check-icon {
+    font-size: 40px;
+    color: #4ADE80;
+}
+
+.success-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+    color: #4ADE80;
+}
+
+.success-subtitle {
+    font-size: 14px;
+    color: var(--amazon-text-main);
+    margin: 0;
+}
+
+.order-details-summary {
+    background-color: var(--amazon-bg);
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.order-num-highlight {
+    color: var(--amazon-blue);
+    font-weight: 700;
+}
+
+.delivery-summary {
+    margin-top: 15px;
+}
+
+.delivery-summary h3 {
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0 0 5px 0;
+}
+
+.delivery-summary h3 strong {
+    color: #4ADE80;
+    font-weight: 700;
+}
+
+.delivery-summary p {
+    font-size: 12px;
+    color: var(--amazon-text-muted);
+    margin: 0;
+}
+
+.amz-action-links {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 14px;
+}
+
+.amz-link-btn {
+    background: none;
+    border: none;
+    color: var(--amazon-blue);
+    cursor: pointer;
+    padding: 0;
+    font-size: 13px;
+}
+
+.amz-link-btn:hover {
+    color: var(--amazon-blue-hover);
+    text-decoration: underline;
+}
+
+.separator {
+    color: #ddd;
+}
+
+/* Failed Box */
+.failed-box {
+    border-top: 3px solid var(--amazon-orange);
+}
+
+.failed-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.error-icon {
+    font-size: 40px;
+    color: var(--amazon-orange);
+}
+
+.failed-header h2 {
+    color: var(--amazon-orange);
+    margin: 0;
+}
+
+.failed-msg {
+    margin-bottom: 20px;
+}
+
+.failed-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.amz-btn {
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-size: 13px;
+    box-shadow: 0 1px 2px rgba(15,17,17,.15);
+    cursor: pointer;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.amz-btn-primary {
+    background: var(--amazon-orange);
+    border-color: var(--amazon-orange-hover);
+    color: #000;
+}
+
+.amz-btn-primary:hover {
+    background-color: var(--amazon-orange-hover);
+}
+
+.amz-btn-secondary {
+    background: var(--amazon-elements-bg);
+    border-color: var(--amazon-border);
+    color: var(--amazon-text-main);
+}
+
+.amz-btn-secondary:hover {
+    background-color: var(--amazon-bg);
+}
+
+/* Processing */
+.processing-box {
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner-icon {
+    font-size: 40px;
+    color: var(--amazon-orange);
+    margin-bottom: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

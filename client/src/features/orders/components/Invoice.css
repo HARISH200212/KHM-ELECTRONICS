@@ -1,0 +1,342 @@
+/* Invoice Modal Overlay */
+.invoice-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Modal Container (The "Viewer" Window) */
+.invoice-component {
+    background: #f0f0f0;
+    /* Grey background like a desk */
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Action Bar at the top (Not printed) */
+.invoice-action-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+.action-btn.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.action-btn.btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.action-btn.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+/* The actual "Paper" Document */
+.invoice-document {
+    background: white;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    /* Force ALL text inside to be dark — overrides any dark-mode global CSS */
+    color: #111 !important;
+}
+
+/* Ensure every text element inside the invoice document is dark */
+.invoice-document *,
+.invoice-document p,
+.invoice-document span,
+.invoice-document h1,
+.invoice-document h2,
+.invoice-document h3,
+.invoice-document td,
+.invoice-document th,
+.invoice-document div {
+    color: inherit;
+}
+
+/* Company Branding Header Band */
+.doc-company-header {
+    background: #0d1b3e;
+    color: white;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.doc-company-name {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: white !important;
+    margin-bottom: 4px;
+}
+
+.doc-company-sub {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.85) !important;
+    margin-top: 2px;
+}
+
+.doc-company-url {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.7) !important;
+    align-self: flex-start;
+    font-style: italic;
+}
+
+/* Header (PRINTABLE INVOICE title) */
+.doc-header {
+    padding: 30px 40px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+
+.doc-title h1 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    line-height: 1.1;
+    color: #1a202c !important;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.doc-qr {
+    font-size: 5rem;
+    color: #4a5568;
+}
+
+/* Info Grids */
+.doc-info-grid {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    row-gap: 20px;
+    padding: 0 40px;
+}
+
+.info-col {
+    flex: 1;
+}
+
+.info-col.right-align {
+    text-align: right;
+}
+
+.info-col.right-align .info-row {
+    justify-content: flex-end;
+    gap: 20px;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 6px;
+    gap: 10px;
+}
+
+.info-label {
+    min-width: 140px;
+    color: #000 !important;
+    font-weight: 500;
+}
+
+.info-label.heavy {
+    font-weight: 700;
+}
+
+.info-val {
+    color: #c17f24 !important; /* Amber — visible and matching the original invoice style */
+    font-weight: 500;
+}
+
+.send-to-header {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.send-to-header .send-to-details .info-row {
+    margin-bottom: 4px;
+}
+
+.doc-divider {
+    border: none;
+    border-top: 2px solid #2d3748;
+    margin: 25px 40px;
+}
+
+/* Table */
+.doc-table-container {
+    margin-top: 40px;
+    padding: 0 40px;
+}
+
+.doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    border: 1px solid #e2e8f0;
+}
+
+.doc-table th,
+.doc-table td {
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    text-align: left;
+}
+
+.doc-table th {
+    background: #f7fafc;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+.col-qty,
+.col-price,
+.col-amount {
+    width: 15%;
+}
+
+/* Totals */
+.doc-totals {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.85rem;
+    padding-right: 40px;
+}
+
+.totals-row {
+    display: flex;
+    justify-content: space-between;
+    width: 300px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.totals-label {
+    color: #1a202c;
+}
+
+.totals-val {
+    color: #333;
+    font-weight: 500;
+}
+
+.grand-total-row {
+    border-bottom: 2px solid #2d3748;
+    font-size: 1rem;
+}
+
+/* Footer Logo */
+.doc-footer-logo {
+    margin-top: 60px;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+    padding: 20px 40px;
+}
+
+.footer-brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.brand-green {
+    color: #48bb78;
+    /* Green "Invoices" */
+}
+
+/* --- Print Styles --- */
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* Force background colors to print */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .hide-on-print,
+    .invoice-action-bar,
+    .roaming-logo-container {
+        display: none !important;
+    }
+
+    .invoice-component {
+        background: white !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        visibility: visible !important;
+    }
+
+    .invoice-document {
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        visibility: visible !important;
+    }
+
+    .invoice-document * {
+        visibility: visible !important;
+    }
+
+    /* Remove page margins in print dialog */
+    @page {
+        margin: 0.5cm;
+    }
+}

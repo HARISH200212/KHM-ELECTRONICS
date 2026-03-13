@@ -1,0 +1,208 @@
+.sale-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    perspective: 1000px;
+}
+
+.sale-alert-content {
+    width: 100%;
+    max-width: 500px;
+    padding: 3rem 2rem;
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 50px rgba(0, 255, 65, 0.2);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background: rgba(5, 5, 5, 0.95);
+}
+
+.alert-glitch-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(0deg,
+            rgba(0, 255, 65, 0.03) 0px,
+            rgba(0, 255, 65, 0.03) 1px,
+            transparent 1px,
+            transparent 2px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.close-alert {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 1.25rem;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    z-index: 2;
+}
+
+.close-alert:hover {
+    opacity: 1;
+}
+
+.alert-icon {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 10px var(--primary));
+    animation: alert-pulse 1s infinite;
+}
+
+@keyframes alert-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.alert-title {
+    font-family: 'monospace';
+    font-size: 0.8rem;
+    color: var(--primary);
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.alert-code {
+    font-family: 'monospace';
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+}
+
+.alert-code .neon {
+    color: var(--primary);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--primary);
+}
+
+.alert-heading {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--text-white);
+    margin-bottom: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -1px;
+}
+
+.alert-text {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 2rem;
+    line-height: 1.4;
+}
+
+.alert-btn {
+    width: 100%;
+    padding: 1.2rem;
+    background: var(--primary);
+    color: black;
+    border: none;
+    border-radius: 4px;
+    font-family: 'monospace';
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+    transition: all 0.3s;
+}
+
+.alert-btn:hover {
+    box-shadow: 0 0 30px var(--primary);
+    transform: translateY(-2px);
+}
+
+.alert-footer {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'monospace';
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    opacity: 0.6;
+}
+
+/* Glitch Animation for the heading */
+.alert-heading {
+    position: relative;
+}
+
+.alert-heading::before,
+.alert-heading::after {
+    content: '30% OFF ALL PRODUCTS';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+
+.alert-heading::before {
+    left: 2px;
+    text-shadow: -2px 0 #ff00c1;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.alert-heading::after {
+    left: -2px;
+    text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+    animation: glitch-anim2 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% {
+        clip: rect(31px, 9999px, 94px, 0);
+        transform: skew(0.85deg);
+    }
+
+    10% {
+        clip: rect(63px, 9999px, 32px, 0);
+        transform: skew(0.55deg);
+    }
+
+    /* ... more frames if needed, simplified for now */
+    100% {
+        clip: rect(41px, 9999px, 82px, 0);
+        transform: skew(0.15deg);
+    }
+}
+
+@keyframes glitch-anim2 {
+    0% {
+        clip: rect(10px, 9999px, 20px, 0);
+        transform: skew(0.85deg);
+    }
+
+    100% {
+        clip: rect(80px, 9999px, 90px, 0);
+        transform: skew(0.15deg);
+    }
+}

@@ -1,0 +1,182 @@
+.electro-footer {
+    background: var(--bg-body);
+    border-top: 1px solid var(--border-olive);
+    margin-top: 60px;
+}
+
+.support-bar {
+    background: var(--primary-gradient);
+    padding: 20px 0;
+}
+
+.support-bar .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.support-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.support-icon {
+    font-size: 2rem;
+    color: #000;
+}
+
+.support-text strong {
+    display: block;
+    font-size: 1.2rem;
+    color: #000;
+}
+
+.support-text span {
+    font-size: 0.85rem;
+    color: #1a1a1a;
+}
+
+.support-newsletter {
+    display: flex;
+    background: var(--bg-card);
+    border: 1px solid var(--border-olive);
+    border-radius: 25px;
+    padding: 5px;
+    width: 400px;
+}
+
+.support-newsletter input {
+    flex: 1;
+    border: none;
+    padding: 10px 20px;
+    outline: none;
+    background: transparent;
+    color: var(--text-light);
+}
+
+.support-newsletter input::placeholder {
+    color: var(--text-dim);
+}
+
+.support-newsletter button {
+    background: var(--bg-dark);
+    color: var(--text-olive);
+    padding: 8px 25px;
+    border-radius: 20px;
+    transition: var(--transition-smooth);
+}
+
+.support-newsletter button:hover {
+    background: #000;
+    color: var(--primary);
+}
+
+.footer-main {
+    padding: 60px 0;
+    background: var(--bg-secondary);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+}
+
+.footer-logo-electro {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
+    margin-bottom: 20px;
+}
+
+.footer-logo-electro .dot {
+    color: var(--primary);
+}
+
+.footer-contact {
+    font-size: 0.95rem;
+    color: var(--text-gray);
+    margin-bottom: 20px;
+}
+
+.footer-contact strong {
+    color: var(--text-olive);
+}
+
+.footer-address {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.footer-col h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 20px;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 12px;
+}
+
+.footer-col ul li a {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    transition: var(--transition-smooth);
+}
+
+.footer-col ul li a:hover {
+    color: var(--primary);
+    padding-left: 5px;
+}
+
+.footer-bottom-electro {
+    padding: 25px 0;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-dark);
+}
+
+.footer-bottom-electro .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-gray);
+}
+
+.payment-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.payment-icons img {
+    height: 25px;
+    opacity: 0.7;
+    filter: grayscale(50%);
+}
+
+@media (max-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .support-bar .nav-container {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .support-newsletter {
+        width: 100%;
+    }
+}
