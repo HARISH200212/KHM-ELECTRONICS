@@ -4,9 +4,18 @@ import CheckoutForm from './CheckoutForm';
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripeKey = (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '').trim();
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 const StripePayment = ({ amount, customerEmail, onPaymentSuccess, onRealtimeStatus }) => {
+    if (!stripePromise) {
+        return (
+            <div className="stripe-payment-container" style={{ padding: '12px', border: '1px solid #ef4444', borderRadius: '8px', color: '#ef4444' }}>
+                Stripe is not configured. Set <strong>VITE_STRIPE_PUBLISHABLE_KEY</strong> in your frontend environment.
+            </div>
+        );
+    }
+
     const appearance = {
         theme: 'stripe',
         variables: {
