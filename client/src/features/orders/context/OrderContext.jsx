@@ -13,7 +13,9 @@ export const OrderProvider = ({ children }) => {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/orders`);
+            const response = await fetch(`${API_BASE_URL}/api/orders`, {
+                credentials: 'include'
+            });
             if (response.ok) {
                 const data = await response.json();
                 setOrders(data);
@@ -42,6 +44,7 @@ export const OrderProvider = ({ children }) => {
             const response = await fetch(`${API_BASE_URL}/api/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(orderPayload)
             });
 
@@ -65,6 +68,7 @@ export const OrderProvider = ({ children }) => {
             await fetch(`${API_BASE_URL}/api/orders/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ 
                     status, 
                     reason, // Pass the reason to the backend

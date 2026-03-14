@@ -128,7 +128,7 @@ const Navbar = () => {
                         <span>Welcome to KH Electronics Store</span>
                     </div>
                     <div className="top-bar-right">
-                        <Link to="/track-order">Track Your Order</Link>
+                        <Link to="/orders">Track Your Order</Link>
                         <Link to="/store-locator">Store Locator</Link>
                     </div>
                 </div>

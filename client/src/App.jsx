@@ -97,7 +97,10 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
             <Route path="orders" element={<Orders />} />
+            <Route path="order" element={<Navigate to="/orders" replace />} />
             <Route path="track-order" element={<Navigate to="/orders" replace />} />
+            <Route path="order-tracking" element={<Navigate to="/orders" replace />} />
+            <Route path="order-tracker" element={<Navigate to="/orders" replace />} />
             <Route path="wishlist" element={<Wishlist />} />
           </Route>
         </Route>

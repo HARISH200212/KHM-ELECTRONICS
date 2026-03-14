@@ -25,6 +25,9 @@ const Orders = () => {
     const [trackingOrderId, setTrackingOrderId] = useState(null);
     const [reviewModal, setReviewModal] = useState(null); // { order, item }
     const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
+    const [returnExchangeModal, setReturnExchangeModal] = useState(null);
+    const [returnExchangeType, setReturnExchangeType] = useState('return');
+    const [returnReason, setReturnReason] = useState('');
     const [cancellingOrder, setCancellingOrder] = useState(null); // order object
     const [cancelReason, setCancelReason] = useState('');
     const [archivedIds, setArchivedIds] = useState(() => {
