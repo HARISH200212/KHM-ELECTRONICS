@@ -547,12 +547,12 @@ const Orders = () => {
                             </div>
 
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                <button className="amz-btn" style={{ flex: 1, background: '#991b1b', color: '#fff' }} onClick={() => setReturnExchangeModal(null)}>
+                                <button className="amz-btn" style={{ flex: 1, background: 'var(--bg-dark)', color: 'var(--text-light)', border: '1px solid var(--border-light)' }} onClick={() => setReturnExchangeModal(null)}>
                                     Go Back
                                 </button>
                                 <button
                                     className="amz-btn"
-                                    style={{ flex: 1, background: returnExchangeType === 'exchange' ? '#2563eb' : '#dc2626', opacity: returnReason ? 1 : 0.5 }}
+                                    style={{ flex: 1, background: 'var(--primary)', color: '#04110a', opacity: returnReason ? 1 : 0.5 }}
                                     onClick={handleConfirmReturnExchange}
                                     disabled={!returnReason}
                                 >

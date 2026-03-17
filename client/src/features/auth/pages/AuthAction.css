@@ -16,18 +16,18 @@
 }
 
 .auth-action-message.processing {
-    border-color: #93c5fd;
-    background: #eff6ff;
+    border-color: rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.08);
 }
 
 .auth-action-message.success {
-    border-color: #86efac;
-    background: #f0fdf4;
+    border-color: rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.12);
 }
 
 .auth-action-message.error {
-    border-color: #fca5a5;
-    background: #fef2f2;
+    border-color: rgba(251, 113, 133, 0.3);
+    background: rgba(251, 113, 133, 0.12);
 }
 
 .auth-action-footer {

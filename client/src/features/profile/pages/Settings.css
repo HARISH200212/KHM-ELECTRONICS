@@ -132,11 +132,12 @@
 .toggle-switch {
     width: 50px;
     height: 26px;
-    background: #fecaca;
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 30px;
     position: relative;
     cursor: pointer;
     transition: var(--transition-smooth);
+    border: 1px solid var(--border-glass);
 }
 
 .toggle-switch::after {
@@ -146,7 +147,7 @@
     left: 3px;
     width: 20px;
     height: 20px;
-    background: white;
+    background: #f0fdf4;
     border-radius: 50%;
     transition: var(--transition-smooth);
 }
@@ -186,9 +187,9 @@
 }
 
 .btn-danger {
-    background: rgba(220, 38, 38, 0.08);
-    color: var(--primary);
-    border: 1px solid var(--primary);
+    background: rgba(251, 113, 133, 0.12);
+    color: #fecdd3;
+    border: 1px solid rgba(251, 113, 133, 0.35);
     padding: 12px 28px;
     border-radius: var(--radius-md);
     font-weight: 700;
@@ -196,8 +197,8 @@
 }
 
 .btn-danger:hover {
-    background: rgba(220, 38, 38, 0.16);
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.18);
+    background: rgba(251, 113, 133, 0.18);
+    box-shadow: 0 0 10px rgba(251, 113, 133, 0.16);
 }
 
 .verification-badge {

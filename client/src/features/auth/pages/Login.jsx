@@ -208,15 +208,15 @@ const Login = () => {
                                     onClick={() => { setIsOtpLogin(true); setError(''); setIsOtpSent(false); }}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', border: '2px dashed #ff00cc', background: 'transparent', color: '#ff00cc' }}
+                                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', border: '2px dashed var(--primary)', background: 'rgba(34, 197, 94, 0.06)', color: 'var(--primary)' }}
                                 >
                                     <FaMobileAlt /> Phone OTP
                                 </motion.button>
                             </div>
 
                             <div className="login-divider" style={{ textAlign: 'center', margin: '15px 0', position: 'relative' }}>
-                                <span style={{ background: 'var(--bg-card)', padding: '0 10px', color: '#888', fontSize: '0.85rem', position: 'relative', zIndex: 1 }}>or email</span>
-                                <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: '#ddd', zIndex: 0 }}></div>
+                                <span style={{ background: 'var(--bg-card)', padding: '0 10px', color: 'var(--text-dim)', fontSize: '0.85rem', position: 'relative', zIndex: 1 }}>or email</span>
+                                <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'var(--border-light)', zIndex: 0 }}></div>
                             </div>
                         </div>
                     )}
@@ -249,16 +249,17 @@ const Login = () => {
                                     >
                                         {devOtp && (
                                             <div style={{
-                                                background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
-                                                border: '1px solid #ff00cc',
+                                                background: 'linear-gradient(135deg, rgba(6, 12, 9, 0.94), rgba(8, 28, 16, 0.9))',
+                                                border: '1px solid var(--border-olive)',
                                                 borderRadius: '8px',
                                                 padding: '12px 16px',
                                                 marginBottom: '12px',
-                                                textAlign: 'center'
+                                                textAlign: 'center',
+                                                boxShadow: 'var(--shadow-olive)'
                                             }}>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#ff00cc', textTransform: 'uppercase', letterSpacing: '1px' }}>Dev Mode OTP</p>
-                                                <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold', color: 'white', letterSpacing: '8px' }}>{devOtp}</p>
-                                                <p style={{ margin: '4px 0 0 0', fontSize: '0.7rem', color: '#888' }}>This appears only when SMS is not configured.</p>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Dev Mode OTP</p>
+                                                <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold', color: 'var(--text-light)', letterSpacing: '8px' }}>{devOtp}</p>
+                                                <p style={{ margin: '4px 0 0 0', fontSize: '0.7rem', color: 'var(--text-dim)' }}>This appears only when SMS is not configured.</p>
                                             </div>
                                         )}
                                         <label>6-Digit OTP Code</label>
@@ -279,7 +280,7 @@ const Login = () => {
                                     disabled={isSubmitting}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    style={{ width: '100%', background: 'linear-gradient(135deg, #ff00cc 0%, #333399 100%)', border: 'none' }}
+                                    style={{ width: '100%', background: 'var(--primary-gradient)', border: '1px solid var(--border-olive)', color: '#04110a' }}
                                 >
                                     {isSubmitting ? 'Processing...' : (isOtpSent ? 'Verify & Login' : 'Send OTP')}
                                 </motion.button>

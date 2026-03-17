@@ -145,16 +145,16 @@
 }
 
 .social-btn.x:hover {
-    background: rgba(220, 38, 38, 0.1);
-    border-color: #dc2626;
-    color: #dc2626;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.25);
+    background: rgba(34, 197, 94, 0.12);
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
 }
 
 .social-btn:hover {
-    background: rgba(220, 38, 38, 0.08);
+    background: var(--primary-subtle);
     transform: translateY(-3px);
-    border-color: rgba(220, 38, 38, 0.25);
+    border-color: var(--border-olive);
 }
 
 .social-btn.google {

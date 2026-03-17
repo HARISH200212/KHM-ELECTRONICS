@@ -1,52 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Red & White Theme */
-  --primary: #dc2626;
-  --primary-hover: #b91c1c;
-  --primary-subtle: rgba(220, 38, 38, 0.12);
-  --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
-  --secondary: #FFFFFF;
-  --secondary-hover: #fff1f2;
+  /* Premium Emerald Glass Theme */
+  --primary: #22c55e;
+  --primary-hover: #16a34a;
+  --primary-subtle: rgba(34, 197, 94, 0.14);
+  --primary-gradient: linear-gradient(135deg, #34d399 0%, #22c55e 45%, #0f7a3f 100%);
+  --secondary: #f7fff9;
+  --secondary-hover: #dcfce7;
 
-  --bg-body: #ffffff;
-  --bg-secondary: #fff5f5;
-  --bg-card: #ffffff;
-  --bg-dark: #ffe4e6;
-  --bg-gradient: linear-gradient(135deg, #ffffff 0%, #fff5f5 50%, #ffe4e6 100%);
+  --bg-body: #040806;
+  --bg-secondary: rgba(11, 20, 15, 0.72);
+  --bg-card: rgba(8, 14, 11, 0.78);
+  --bg-dark: rgba(3, 8, 5, 0.94);
+  --bg-gradient: linear-gradient(135deg, rgba(6, 12, 9, 0.98) 0%, rgba(5, 16, 10, 0.94) 45%, rgba(3, 7, 5, 0.98) 100%);
 
-  --text-dark: #111827;
-  --text-gray: #6b7280;
-  --text-light: #1f2937;
-  --text-dim: #4b5563;
-  --text-olive: #b91c1c;
-  --text-white: #111827;
+  --text-dark: #f4fff7;
+  --text-gray: #7b8f84;
+  --text-light: #e7fff0;
+  --text-dim: #9fb4a7;
+  --text-olive: #7ee2a8;
+  --text-white: #f4fff7;
 
-  --border-light: #fecaca;
-  --border-medium: #fca5a5;
-  --border-olive: rgba(220, 38, 38, 0.25);
+  --border-light: rgba(167, 243, 208, 0.18);
+  --border-medium: rgba(74, 222, 128, 0.28);
+  --border-olive: rgba(34, 197, 94, 0.3);
+  --border-glass: rgba(255, 255, 255, 0.08);
 
   --font-main: 'Inter', sans-serif;
   --font-display: 'Montserrat', sans-serif;
   --transition-smooth: 0.25s ease-in-out;
   --radius-lg: 12px;
   --radius-md: 4px;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --shadow-olive: 0 4px 20px rgba(220, 38, 38, 0.2);
-  --glow-olive: 0 0 20px rgba(220, 38, 38, 0.25);
-  --error: #ef4444;
+  --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.18);
+  --shadow-md: 0 20px 60px rgba(0, 0, 0, 0.32);
+  --shadow-olive: 0 20px 45px rgba(34, 197, 94, 0.16);
+  --glow-olive: 0 0 28px rgba(34, 197, 94, 0.22);
+  --error: #fb7185;
 
   /* Amazon Theme Variables */
-  --amazon-orange: #dc2626;
-  --amazon-orange-hover: #b91c1c;
-  --amazon-blue: #dc2626;
-  --amazon-blue-hover: #b91c1c;
-  --amazon-bg: #ffffff;
-  --amazon-elements-bg: #ffffff;
-  --amazon-text-main: #111827;
-  --amazon-text-muted: #6b7280;
-  --amazon-border: #fecaca;
+  --amazon-orange: #22c55e;
+  --amazon-orange-hover: #16a34a;
+  --amazon-blue: #22c55e;
+  --amazon-blue-hover: #16a34a;
+  --amazon-bg: #040806;
+  --amazon-elements-bg: rgba(8, 14, 11, 0.82);
+  --amazon-text-main: #f4fff7;
+  --amazon-text-muted: #9fb4a7;
+  --amazon-border: rgba(167, 243, 208, 0.18);
 }
 
 * {
@@ -57,6 +58,10 @@
 
 body {
   font-family: var(--font-main);
+  background:
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), transparent 32%),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.1), transparent 24%),
+    linear-gradient(135deg, #07110b 0%, #040806 52%, #020503 100%);
   background-color: var(--bg-body);
   color: var(--text-dark);
   line-height: 1.6;
@@ -64,10 +69,30 @@ body {
   min-height: 100vh;
 }
 
-/* Remove Hacker/Matrix effects */
-body::after,
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: auto;
+  width: 320px;
+  height: 320px;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.28;
+  z-index: 0;
+}
+
 body::before {
-  display: none;
+  top: -80px;
+  left: -70px;
+  background: rgba(34, 197, 94, 0.24);
+}
+
+body::after {
+  right: -100px;
+  bottom: 10%;
+  background: rgba(16, 185, 129, 0.16);
 }
 
 a {
@@ -95,11 +120,11 @@ button {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-olive);
-  box-shadow: var(--shadow-md);
+  background: rgba(10, 18, 14, 0.62);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 /* Professional Style Buttons */
@@ -129,7 +154,7 @@ button {
 .btn-primary {
   background: var(--primary-gradient);
   color: #FFFFFF;
-  border: 1px solid rgba(220, 38, 38, 0.25);
+  border: 1px solid rgba(52, 211, 153, 0.28);
   font-weight: 700;
   position: relative;
   z-index: 1;
@@ -166,11 +191,11 @@ button {
 .btn-primary:hover {
   background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(220, 38, 38, 0.35), 0 0 30px rgba(220, 38, 38, 0.2);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.24), 0 0 38px rgba(34, 197, 94, 0.14);
 }
 
 .btn-secondary {
-  background: rgba(220, 38, 38, 0.08);
+  background: rgba(34, 197, 94, 0.08);
   color: var(--text-olive);
   border: 1px solid var(--border-olive);
   position: relative;
@@ -178,10 +203,10 @@ button {
 }
 
 .btn-secondary:hover {
-  background: rgba(220, 38, 38, 0.16);
+  background: rgba(34, 197, 94, 0.16);
   border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 0 10px rgba(220, 38, 38, 0.2), inset 0 0 5px rgba(220, 38, 38, 0.12);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.18), inset 0 0 5px rgba(34, 197, 94, 0.1);
 }
 
 /* Water Wave Ripple Effect */
@@ -223,12 +248,12 @@ button {
 }
 
 .btn-secondary .ripple {
-  background: radial-gradient(circle, rgba(220, 38, 38, 0.45) 0%, rgba(220, 38, 38, 0.2) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.45) 0%, rgba(34, 197, 94, 0.2) 40%, transparent 70%);
 }
 
 /* Dark button ripple */
 .btn-dark .ripple {
-  background: radial-gradient(circle, rgba(220, 38, 38, 0.45) 0%, rgba(220, 38, 38, 0.18) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.45) 0%, rgba(34, 197, 94, 0.18) 40%, transparent 70%);
 }
 
 .section-title {
@@ -268,5 +293,5 @@ button {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b91c1c;
+  background: var(--primary-hover);
 }

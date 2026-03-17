@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.82);
+    background: rgba(2, 6, 4, 0.78);
     backdrop-filter: blur(10px);
     z-index: 2000;
     display: flex;
@@ -18,10 +18,13 @@
     max-width: 600px;
     padding: 2.5rem;
     border: 1px solid var(--primary);
-    box-shadow: 0 0 40px rgba(220, 38, 38, 0.2);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 32px rgba(34, 197, 94, 0.12);
     position: relative;
     background: var(--bg-card);
     z-index: 2001;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 18px;
 }
 
 .terminal-header {
@@ -102,7 +105,7 @@
     width: 6px;
     background: var(--primary);
     border-radius: 3px;
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.35);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.35);
 }
 
 .transcript-display {
@@ -161,7 +164,7 @@
 .voice-btn.start {
     background: var(--primary);
     color: #fff;
-    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.28);
 }
 
 .voice-btn.stop {

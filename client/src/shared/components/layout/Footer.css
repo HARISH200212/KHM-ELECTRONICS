@@ -34,16 +34,18 @@
 
 .support-text span {
     font-size: 0.85rem;
-    color: #ffe4e6;
+    color: #d9ffe7;
 }
 
 .support-newsletter {
     display: flex;
-    background: var(--bg-card);
-    border: 1px solid var(--border-olive);
+    background: rgba(6, 12, 9, 0.68);
+    border: 1px solid var(--border-glass);
     border-radius: 25px;
     padding: 5px;
     width: 400px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 }
 
 .support-newsletter input {
