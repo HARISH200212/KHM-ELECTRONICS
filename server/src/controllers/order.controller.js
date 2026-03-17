@@ -46,12 +46,14 @@ exports.createOrder = async (req, res) => {
             notifyOrderPlacement(
                 { email: customerEmail, name: customerName, phone: customerPhone },
                 {
-                    _id: order.id,
+                    _id: order._id,
+                    id: order.id,
                     totalAmount: Number(order.total),
+                    total: Number(order.total),
                     shippingAddress: { address: order.customer?.address || '' },
                     status: order.paymentStatus || 'Paid',
                     items: order.items || [],
-                    date: order.createdAt || new Date(),
+                    createdAt: order.createdAt || new Date(),
                     paymentMethod: order.paymentMethod || 'Card'
                 }
             ).catch(err => console.error("Immediate notification failed:", err));
@@ -86,7 +88,7 @@ exports.sendConfirmation = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, customer, order } = req.body;
+        const { status, reason, customer, order } = req.body;
 
         const updateFields = { status };
         if (reason) updateFields.cancellationReason = reason;

@@ -1,29 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Golden & White Theme */
-  --primary: #D4AF37;
-  --primary-hover: #C5A017;
-  --primary-subtle: rgba(212, 175, 55, 0.15);
-  --primary-gradient: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #C5A017 100%);
+  /* Red & White Theme */
+  --primary: #dc2626;
+  --primary-hover: #b91c1c;
+  --primary-subtle: rgba(220, 38, 38, 0.12);
+  --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
   --secondary: #FFFFFF;
-  --secondary-hover: #F8F9FA;
+  --secondary-hover: #fff1f2;
 
-  --bg-body: #121212;
-  --bg-secondary: #1A1A1A;
-  --bg-card: #1E1E1E;
-  --bg-dark: #0A0A0A;
-  --bg-gradient: linear-gradient(135deg, #121212 0%, #1A1A1A 50%, #0A0A0A 100%);
+  --bg-body: #ffffff;
+  --bg-secondary: #fff5f5;
+  --bg-card: #ffffff;
+  --bg-dark: #ffe4e6;
+  --bg-gradient: linear-gradient(135deg, #ffffff 0%, #fff5f5 50%, #ffe4e6 100%);
 
-  --text-dark: #F8F9FA;
-  --text-gray: #ADB5BD;
-  --text-light: #E9ECEF;
-  --text-dim: #6C757D;
-  --text-olive: #D4AF37;
+  --text-dark: #111827;
+  --text-gray: #6b7280;
+  --text-light: #1f2937;
+  --text-dim: #4b5563;
+  --text-olive: #b91c1c;
+  --text-white: #111827;
 
-  --border-light: #333333;
-  --border-medium: #444444;
-  --border-olive: rgba(212, 175, 55, 0.3);
+  --border-light: #fecaca;
+  --border-medium: #fca5a5;
+  --border-olive: rgba(220, 38, 38, 0.25);
 
   --font-main: 'Inter', sans-serif;
   --font-display: 'Montserrat', sans-serif;
@@ -32,20 +33,20 @@
   --radius-md: 4px;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --shadow-olive: 0 4px 20px rgba(212, 175, 55, 0.25);
-  --glow-olive: 0 0 20px rgba(212, 175, 55, 0.4);
+  --shadow-olive: 0 4px 20px rgba(220, 38, 38, 0.2);
+  --glow-olive: 0 0 20px rgba(220, 38, 38, 0.25);
   --error: #ef4444;
 
   /* Amazon Theme Variables */
-  --amazon-orange: #D4AF37;
-  --amazon-orange-hover: #F3E5AB;
-  --amazon-blue: #D4AF37;
-  --amazon-blue-hover: #F3E5AB;
-  --amazon-bg: #121212;
-  --amazon-elements-bg: #1E1E1E;
-  --amazon-text-main: #F4F4F4;
-  --amazon-text-muted: #AAAAAA;
-  --amazon-border: #333333;
+  --amazon-orange: #dc2626;
+  --amazon-orange-hover: #b91c1c;
+  --amazon-blue: #dc2626;
+  --amazon-blue-hover: #b91c1c;
+  --amazon-bg: #ffffff;
+  --amazon-elements-bg: #ffffff;
+  --amazon-text-main: #111827;
+  --amazon-text-muted: #6b7280;
+  --amazon-border: #fecaca;
 }
 
 * {
@@ -128,7 +129,7 @@ button {
 .btn-primary {
   background: var(--primary-gradient);
   color: #FFFFFF;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(220, 38, 38, 0.25);
   font-weight: 700;
   position: relative;
   z-index: 1;
@@ -165,11 +166,11 @@ button {
 .btn-primary:hover {
   background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 0 30px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 0 15px rgba(220, 38, 38, 0.35), 0 0 30px rgba(220, 38, 38, 0.2);
 }
 
 .btn-secondary {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(220, 38, 38, 0.08);
   color: var(--text-olive);
   border: 1px solid var(--border-olive);
   position: relative;
@@ -177,10 +178,10 @@ button {
 }
 
 .btn-secondary:hover {
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(220, 38, 38, 0.16);
   border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3), inset 0 0 5px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.2), inset 0 0 5px rgba(220, 38, 38, 0.12);
 }
 
 /* Water Wave Ripple Effect */
@@ -222,12 +223,12 @@ button {
 }
 
 .btn-secondary .ripple {
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.6) 0%, rgba(212, 175, 55, 0.3) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.45) 0%, rgba(220, 38, 38, 0.2) 40%, transparent 70%);
 }
 
 /* Dark button ripple */
 .btn-dark .ripple {
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.5) 0%, rgba(212, 175, 55, 0.2) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.45) 0%, rgba(220, 38, 38, 0.18) 40%, transparent 70%);
 }
 
 .section-title {
@@ -267,5 +268,5 @@ button {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #b91c1c;
 }

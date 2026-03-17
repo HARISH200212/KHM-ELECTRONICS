@@ -1,0 +1,35 @@
+.auth-action-card {
+    max-width: 520px;
+}
+
+.auth-action-state {
+    margin-top: 1rem;
+}
+
+.auth-action-message {
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+    color: var(--text-light);
+    text-align: left;
+}
+
+.auth-action-message.processing {
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
+.auth-action-message.success {
+    border-color: #86efac;
+    background: #f0fdf4;
+}
+
+.auth-action-message.error {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.auth-action-footer {
+    text-align: center;
+}

@@ -1,25 +1,256 @@
+const fs = require('fs');
+const path = require('path');
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_PORT === '465', // true for 465, false for other ports
-    auth: {
+const getClientUrl = () => {
+    const raw = (process.env.CLIENT_URL || 'http://localhost:5173').trim();
+    if (!raw) {
+        return 'http://localhost:5173';
+    }
+
+    const withProtocol = raw.startsWith('http://') || raw.startsWith('https://')
+        ? raw
+        : `https://${raw}`;
+
+    try {
+        const parsed = new URL(withProtocol);
+        return `${parsed.protocol}//${parsed.host}`;
+    } catch (_error) {
+        return 'http://localhost:5173';
+    }
+};
+
+const senderAddress = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+
+const buildTransportConfig = () => {
+    const auth = {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-        rejectUnauthorized: false
+    };
+
+    if (process.env.EMAIL_SERVICE) {
+        return {
+            service: process.env.EMAIL_SERVICE,
+            auth,
+            tls: {
+                rejectUnauthorized: false
+            }
+        };
     }
-});
+
+    return {
+        host: process.env.EMAIL_HOST,
+        port: Number(process.env.EMAIL_PORT || 587),
+        secure: String(process.env.EMAIL_PORT || '587') === '465',
+        auth,
+        tls: {
+            rejectUnauthorized: false
+        }
+    };
+};
+
+const transporter = nodemailer.createTransport(buildTransportConfig());
+
+const getOrderId = (order = {}) => {
+    const raw = order._id || order.id;
+    return raw ? String(raw) : `ORD-${Date.now()}`;
+};
+
+const getOrderTotal = (order = {}) => {
+    if (Number.isFinite(Number(order.totalAmount))) return Number(order.totalAmount);
+    if (Number.isFinite(Number(order.total))) return Number(order.total);
+    return (order.items || []).reduce((sum, item) => {
+        const price = Number(item?.price || 0);
+        const qty = Number(item?.quantity || 1);
+        return sum + (price * qty);
+    }, 0);
+};
+
+const isEmailConfigured = () => {
+    return Boolean(senderAddress && process.env.EMAIL_PASS && (process.env.EMAIL_SERVICE || process.env.EMAIL_HOST));
+};
+
+const saveFallbackEmail = (fileName, html) => {
+    const fallbackPath = path.join(__dirname, '..', '..', fileName);
+    fs.writeFileSync(fallbackPath, html);
+    return fallbackPath;
+};
+
+const sendMailWithFallback = async ({ mailOptions, fallbackFileName, html, logLabel }) => {
+    if (!isEmailConfigured()) {
+        const fallbackPath = saveFallbackEmail(fallbackFileName, html);
+        console.warn(`[Email] ${logLabel} not sent because email is not configured. Preview saved to ${fallbackPath}`);
+        return { delivered: false, fallbackPath };
+    }
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`[Email] ${logLabel} sent to ${mailOptions.to}`);
+        return { delivered: true };
+    } catch (error) {
+        console.error(`[Email] ${logLabel} failed:`, error.message);
+        const fallbackPath = saveFallbackEmail(fallbackFileName, html);
+        console.warn(`[Email] Preview saved to ${fallbackPath}`);
+        return { delivered: false, fallbackPath, error };
+    }
+};
+
+const buildActionUrl = (action, token) => `${getClientUrl()}/auth/action?action=${encodeURIComponent(action)}&token=${encodeURIComponent(token)}`;
+
+const renderActionEmail = ({ heading, intro, actionLabel, actionUrl, outro, accent = '#dc2626' }) => `
+    <div style="font-family: Arial, Helvetica, sans-serif; background-color: #f8fafc; padding: 40px 20px; color: #111827;">
+        <div style="max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);">
+            <div style="padding: 28px 32px; background: linear-gradient(135deg, ${accent} 0%, #991b1b 100%); color: #ffffff;">
+                <h1 style="margin: 0; font-size: 24px; font-weight: 800;">${heading}</h1>
+            </div>
+            <div style="padding: 32px; line-height: 1.7; font-size: 15px; color: #374151;">
+                <p style="margin-top: 0;">${intro}</p>
+                <div style="margin: 28px 0; text-align: center;">
+                    <a href="${actionUrl}" style="display: inline-block; background: ${accent}; color: #ffffff; text-decoration: none; font-weight: 700; padding: 14px 22px; border-radius: 10px;">${actionLabel}</a>
+                </div>
+                <p>If the button does not work, copy and paste this link into your browser:</p>
+                <p style="word-break: break-all; color: ${accent};">${actionUrl}</p>
+                <p style="margin-bottom: 0;">${outro}</p>
+            </div>
+        </div>
+    </div>
+`;
+
+const sendVerificationEmail = async (user, rawToken) => {
+    const actionUrl = buildActionUrl('verify-email', rawToken);
+    const html = renderActionEmail({
+        heading: 'Verify Your Email',
+        intro: `Hello ${user.name || 'there'}, please confirm your email address to activate your KHM Electronics account.`,
+        actionLabel: 'Verify Email',
+        actionUrl,
+        outro: 'This verification link expires in 24 hours. If you did not create this account, you can ignore this email.'
+    });
+
+    return sendMailWithFallback({
+        mailOptions: {
+            from: senderAddress,
+            to: user.email,
+            subject: 'Verify your KHM Electronics email',
+            html,
+        },
+        fallbackFileName: 'latest-email-verification.html',
+        html,
+        logLabel: 'Email verification'
+    });
+};
+
+const sendPasswordResetEmail = async (user, rawToken) => {
+    const actionUrl = buildActionUrl('reset-password', rawToken);
+    const html = renderActionEmail({
+        heading: 'Reset Your Password',
+        intro: `Hello ${user.name || 'there'}, we received a request to reset the password for your KHM Electronics account.`,
+        actionLabel: 'Reset Password',
+        actionUrl,
+        outro: 'This password reset link expires in 1 hour. If you did not request this, you can ignore this email.'
+    });
+
+    return sendMailWithFallback({
+        mailOptions: {
+            from: senderAddress,
+            to: user.email,
+            subject: 'Reset your KHM Electronics password',
+            html,
+        },
+        fallbackFileName: 'latest-password-reset.html',
+        html,
+        logLabel: 'Password reset'
+    });
+};
+
+const sendEmailChangeConfirmationEmail = async (user, newEmail, rawToken) => {
+    const actionUrl = buildActionUrl('confirm-email-change', rawToken);
+    const html = renderActionEmail({
+        heading: 'Confirm Your New Email',
+        intro: `Hello ${user.name || 'there'}, confirm that you want to change your KHM Electronics email address to ${newEmail}.`,
+        actionLabel: 'Confirm Email Change',
+        actionUrl,
+        outro: 'This email change link expires in 1 hour. If you did not request this, you can ignore this message.'
+    });
+
+    return sendMailWithFallback({
+        mailOptions: {
+            from: senderAddress,
+            to: newEmail,
+            subject: 'Confirm your new KHM Electronics email',
+            html,
+        },
+        fallbackFileName: 'latest-email-change-confirmation.html',
+        html,
+        logLabel: 'Email change confirmation'
+    });
+};
+
+const sendEmailChangeNotificationEmail = async (user, newEmail) => {
+    if (!user.email) {
+        return { delivered: false };
+    }
+
+    const html = renderActionEmail({
+        heading: 'Email Change Requested',
+        intro: `Hello ${user.name || 'there'}, a request was made to change your KHM Electronics email address from ${user.email} to ${newEmail}.`,
+        actionLabel: 'Open Account',
+        actionUrl: `${getClientUrl()}/settings`,
+        outro: 'If this was not you, reset your password immediately and contact support.',
+        accent: '#2563eb'
+    });
+
+    return sendMailWithFallback({
+        mailOptions: {
+            from: senderAddress,
+            to: user.email,
+            subject: 'KHM Electronics email change requested',
+            html,
+        },
+        fallbackFileName: 'latest-email-change-notice.html',
+        html,
+        logLabel: 'Email change notice'
+    });
+};
+
+const sendAccountReminderEmail = async (user) => {
+    const html = renderActionEmail({
+        heading: 'Your Account Email',
+        intro: `Hello ${user.name || 'there'}, this email was requested as a reminder for the email address linked to your KHM Electronics account.`,
+        actionLabel: 'Open Login',
+        actionUrl: `${getClientUrl()}/login`,
+        outro: `Your account email is ${user.email}. If you did not request this reminder, you can safely ignore this message.`,
+        accent: '#059669'
+    });
+
+    return sendMailWithFallback({
+        mailOptions: {
+            from: senderAddress,
+            to: user.email,
+            subject: 'Your KHM Electronics account email',
+            html,
+        },
+        fallbackFileName: 'latest-account-reminder.html',
+        html,
+        logLabel: 'Account reminder'
+    });
+};
 
 const sendOrderConfirmation = async (user, order) => {
     try {
+        if (!isEmailConfigured()) {
+            throw new Error('Email service is not configured. Set EMAIL_HOST, EMAIL_USER and EMAIL_PASS.');
+        }
+
+        const orderId = getOrderId(order);
+        const totalAmount = getOrderTotal(order);
+        const orderSuffix = orderId.slice(-6).toUpperCase();
+        const trackingSuffix = orderId.slice(-8).toUpperCase();
+
         const mailOptions = {
-            from: process.env.EMAIL_FROM,
+            from: senderAddress,
             to: user.email,
             bcc: process.env.EMAIL_USER, // Send copy to the store owner's given email address
-            subject: `Order Confirmation - #${order._id.toString().slice(-6)}`,
+            subject: `Order Confirmation - #${orderSuffix}`,
             html: `
             <div style="font-family: Arial, Helvetica, sans-serif; background-color: #f0f0f0; padding: 40px 20px; text-align: center;">
                 <div style="background-color: #ffffff; max-width: 800px; margin: 0 auto; padding: 40px; text-align: left; color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
@@ -30,7 +261,7 @@ const sendOrderConfirmation = async (user, order) => {
                             <h1 style="font-size: 36px; font-weight: 900; line-height: 1.1; color: #1a202c; letter-spacing: 1px; margin: 0;">PRINTABLE<br/>INVOICE</h1>
                         </div>
                         <div style="text-align: right;">
-                            <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/orders" style="display: inline-block; background-color: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; font-size: 14px;">TRACK ORDER</a>
+                            <a href="${getClientUrl()}/orders" style="display: inline-block; background-color: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; font-size: 14px;">TRACK ORDER</a>
                         </div>
                     </div>
 
@@ -47,7 +278,7 @@ const sendOrderConfirmation = async (user, order) => {
                             <td width="50%" valign="top">
                                 <div style="margin-bottom: 6px;"><strong style="display: inline-block; width: 140px;">Telephone / E-mail:</strong> <span style="color: #333;">+91 9876543210</span></div>
                                 <div style="margin-bottom: 6px;"><strong style="display: inline-block; width: 140px;">Shipping Date:</strong> <span style="color: #333;">${new Date().toLocaleDateString('en-IN')}</span></div>
-                                <div style="margin-bottom: 6px;"><strong style="display: inline-block; width: 140px;">Tracking Number:</strong> <span style="color: #333; font-family: monospace; font-weight: bold;">KHM-${order._id.toString().slice(-8).toUpperCase()}</span></div>
+                                <div style="margin-bottom: 6px;"><strong style="display: inline-block; width: 140px;">Tracking Number:</strong> <span style="color: #333; font-family: monospace; font-weight: bold;">KHM-${trackingSuffix}</span></div>
                                 <div style="margin-bottom: 6px;"><strong style="display: inline-block; width: 140px;">Sender VAT Number:</strong> <span style="color: #333;">29XXXXX1234X1Z5</span></div>
                             </td>
                         </tr>
@@ -61,15 +292,15 @@ const sendOrderConfirmation = async (user, order) => {
                             <td width="50%" valign="top">
                                 <strong style="display: block; margin-bottom: 10px;">Send To</strong>
                                 <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Receiver Name:</strong> <span style="color: #333;">${user.name}</span></div>
-                                <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Address:</strong> <span style="color: #333;">${order.shippingAddress?.address || 'N/A'}</span></div>
+                                <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Address:</strong> <span style="color: #333;">${order.shippingAddress?.address || order.customer?.address || 'N/A'}</span></div>
                                 <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Location:</strong> <span style="color: #333;">India</span></div>
                                 <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Telephone / E-mail:</strong> <span style="color: #333;">${user.email}</span></div>
                                 <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Receiver VAT Number:</strong> <span style="color: #333;">-</span></div>
                             </td>
                             <td width="50%" valign="top" align="right">
-                                <div style="margin-bottom: 6px;"><strong style="margin-right: 15px;">Invoice Number</strong> <span style="color: #333;">INV-${order._id.toString().slice(-6)}</span></div>
+                                <div style="margin-bottom: 6px;"><strong style="margin-right: 15px;">Invoice Number</strong> <span style="color: #333;">INV-${orderSuffix}</span></div>
                                 <div style="margin-bottom: 6px;"><strong style="margin-right: 15px;">Date</strong> <span style="color: #333;">${new Date(order.createdAt || new Date()).toLocaleDateString('en-IN')}</span></div>
-                                <div style="margin-bottom: 6px;"><strong style="margin-right: 15px;">Order Number</strong> <span style="color: #333;">${order._id}</span></div>
+                                <div style="margin-bottom: 6px;"><strong style="margin-right: 15px;">Order Number</strong> <span style="color: #333;">${orderId}</span></div>
                                 <div style="margin-bottom: 6px;"><strong>Country of Origin</strong></div>
                                 <div style="margin-bottom: 6px;"><strong>Country of destination</strong></div>
                                 <div style="margin-bottom: 6px;"><strong>Terms of Payment</strong></div>
@@ -104,7 +335,7 @@ const sendOrderConfirmation = async (user, order) => {
                     <table width="300" style="font-size: 13px; margin-top: 20px; float: right;" cellpadding="8">
                         <tr>
                             <td style="border-bottom: 1px solid #e2e8f0;"><strong>Subtotal</strong></td>
-                            <td style="border-bottom: 1px solid #e2e8f0; text-align: right; color: #333;">₹${(order.totalAmount / 1.18).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                            <td style="border-bottom: 1px solid #e2e8f0; text-align: right; color: #333;">₹${(totalAmount / 1.18).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td style="border-bottom: 1px solid #e2e8f0;"><strong>Discount (0%)</strong></td>
@@ -112,11 +343,11 @@ const sendOrderConfirmation = async (user, order) => {
                         </tr>
                         <tr>
                             <td style="border-bottom: 1px solid #e2e8f0;"><strong>Tax 1 (18% GST)</strong></td>
-                            <td style="border-bottom: 1px solid #e2e8f0; text-align: right; color: #333;">₹${(order.totalAmount - (order.totalAmount / 1.18)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                            <td style="border-bottom: 1px solid #e2e8f0; text-align: right; color: #333;">₹${(totalAmount - (totalAmount / 1.18)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td style="border-bottom: 2px solid #2d3748; font-size: 15px;"><strong>Total</strong></td>
-                            <td style="border-bottom: 2px solid #2d3748; text-align: right; color: #333; font-size: 15px; font-weight: bold;">₹${order.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                            <td style="border-bottom: 2px solid #2d3748; text-align: right; color: #333; font-size: 15px; font-weight: bold;">₹${totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                         </tr>
                     </table>
                     <div style="clear: both;"></div>
@@ -130,24 +361,12 @@ const sendOrderConfirmation = async (user, order) => {
             `,
         };
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log(`Order confirmation email sent to ${user.email}`);
-        } catch (error) {
-            console.error('Error sending order confirmation email. Note: Your network may be blocking SMTP (Port 465/587).');
-            console.error('Original Error:', error.message);
-            
-            // Developer Fallback: Write the email HTML to a local file if SMTP is blocked
-            const fs = require('fs');
-            const path = require('path');
-            const fallbackPath = path.join(__dirname, '..', '..', 'latest-order-invoice.html');
-            try {
-                fs.writeFileSync(fallbackPath, mailOptions.html);
-                console.log(`\n✅ FALLBACK: Since the email couldn't be sent, the invoice has been saved locally at: ${fallbackPath}\n`);
-            } catch (fsError) {
-                console.error('Could not save fallback email:', fsError.message);
-            }
-        }
+        await sendMailWithFallback({
+            mailOptions,
+            fallbackFileName: 'latest-order-invoice.html',
+            html: mailOptions.html,
+            logLabel: 'Order confirmation'
+        });
     } catch (err) {
         console.error('Unexpected error generating order email template:', err);
     }
@@ -156,12 +375,12 @@ const sendOrderConfirmation = async (user, order) => {
 const sendContactEmail = async ({ name, email, subject, message }) => {
     try {
         const mailOptions = {
-            from: process.env.EMAIL_FROM,
+            from: senderAddress,
             to: process.env.EMAIL_USER,
             replyTo: email,
             subject: `Contact Form: ${subject || 'New Inquiry'} from ${name} `,
             html: `
-            < div style = "font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e0e0e0;" >
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e0e0e0;">
                     <div style="background-color: #7e57c2; padding: 20px; text-align: left;">
                         <h2 style="margin: 0; color: #ffffff;">New Contact Form Submission</h2>
                     </div>
@@ -173,12 +392,16 @@ const sendContactEmail = async ({ name, email, subject, message }) => {
                             <p style="margin: 0; white-space: pre-wrap;">${message}</p>
                         </div>
                     </div>
-                </div >
+                </div>
     `,
         };
 
-        await transporter.sendMail(mailOptions);
-        console.log(`Contact email received from ${email} `);
+        await sendMailWithFallback({
+            mailOptions,
+            fallbackFileName: 'latest-contact-email.html',
+            html: mailOptions.html,
+            logLabel: 'Contact form'
+        });
     } catch (error) {
         console.error('Error sending contact email:', error);
     }
@@ -187,7 +410,7 @@ const sendContactEmail = async ({ name, email, subject, message }) => {
 const sendStatusUpdateEmail = async (user, order) => {
     try {
         const mailOptions = {
-            from: process.env.EMAIL_FROM,
+            from: senderAddress,
             to: user.email,
             subject: `Update on your Order - #${order.id || order._id}`,
             html: `
@@ -201,27 +424,19 @@ const sendStatusUpdateEmail = async (user, order) => {
                     </div>
                     <p style="font-size: 16px;">You can track the progress of your order using the button below:</p>
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/orders" style="display: inline-block; background-color: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; font-size: 14px;">VIEW MY ORDERS</a>
+                        <a href="${getClientUrl()}/orders" style="display: inline-block; background-color: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; font-size: 14px;">VIEW MY ORDERS</a>
                     </div>
                 </div>
             </div>
             `,
         };
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log(`Status update email sent to ${user.email}`);
-        } catch (error) {
-            console.error('Error sending status update email. Note: Your network may be blocking SMTP.', error.message);
-            // Fallback
-            const fs = require('fs');
-            const path = require('path');
-            const fallbackPath = path.join(__dirname, '..', '..', 'latest-status-update.html');
-            try {
-                fs.writeFileSync(fallbackPath, mailOptions.html);
-                console.log(`\n✅ FALLBACK: Status update email saved locally at: ${fallbackPath}\n`);
-            } catch (fsError) {}
-        }
+        await sendMailWithFallback({
+            mailOptions,
+            fallbackFileName: 'latest-status-update.html',
+            html: mailOptions.html,
+            logLabel: 'Order status update'
+        });
     } catch (err) {
         console.error('Unexpected error generating status email template:', err);
     }
@@ -230,7 +445,7 @@ const sendStatusUpdateEmail = async (user, order) => {
 const sendDailySummaryEmail = async (stats) => {
     try {
         const mailOptions = {
-            from: process.env.EMAIL_FROM,
+            from: senderAddress,
             to: process.env.EMAIL_USER,
             subject: `Daily Business Summary - ${new Date().toLocaleDateString('en-IN')}`,
             html: `
@@ -284,7 +499,7 @@ const sendDailySummaryEmail = async (stats) => {
                         </table>
 
                         <div style="margin-top: 40px; text-align: center;">
-                            <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/admin" style="display: inline-block; background-color: #0f172a; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">GO TO ADMIN DASHBOARD</a>
+                            <a href="${getClientUrl()}/admin" style="display: inline-block; background-color: #0f172a; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">GO TO ADMIN DASHBOARD</a>
                         </div>
                     </div>
 
@@ -298,24 +513,27 @@ const sendDailySummaryEmail = async (stats) => {
             `,
         };
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log(`Daily summary email sent to administrator`);
-        } catch (error) {
-            console.error('Error sending daily summary email. Note: Your network may be blocking SMTP.', error.message);
-            // Fallback
-            const fs = require('fs');
-            const path = require('path');
-            const fallbackPath = path.join(__dirname, '..', '..', 'latest-daily-summary.html');
-            try {
-                fs.writeFileSync(fallbackPath, mailOptions.html);
-                console.log(`\n✅ FALLBACK: Daily summary email saved locally at: ${fallbackPath}\n`);
-            } catch (fsError) {}
-        }
+        await sendMailWithFallback({
+            mailOptions,
+            fallbackFileName: 'latest-daily-summary.html',
+            html: mailOptions.html,
+            logLabel: 'Daily summary'
+        });
     } catch (err) {
         console.error('Unexpected error generating daily summary email template:', err);
     }
 };
 
-module.exports = { sendOrderConfirmation, sendContactEmail, sendStatusUpdateEmail, sendDailySummaryEmail };
+module.exports = {
+    sendOrderConfirmation,
+    sendContactEmail,
+    sendStatusUpdateEmail,
+    sendDailySummaryEmail,
+    sendVerificationEmail,
+    sendPasswordResetEmail,
+    sendEmailChangeConfirmationEmail,
+    sendEmailChangeNotificationEmail,
+    sendAccountReminderEmail,
+    isEmailConfigured,
+};
 

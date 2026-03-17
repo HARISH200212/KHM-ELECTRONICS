@@ -7,12 +7,14 @@ import { toast } from 'react-hot-toast';
 import './Settings.css';
 
 const Settings = () => {
-    const { user, updateProfile } = useAuth();
+    const { user, updateProfile, requestEmailChange, resendVerificationEmail } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('profile');
     const [name, setName] = useState(user?.name || '');
     const [email] = useState(user?.email || '');
     const [isUpdating, setIsUpdating] = useState(false);
+    const [newEmailAddress, setNewEmailAddress] = useState('');
+    const [emailChangePassword, setEmailChangePassword] = useState('');
 
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -75,6 +77,37 @@ const Settings = () => {
             toast.error(error.message || 'Failed to update password');
         } finally {
             setIsUpdating(false);
+        }
+    };
+
+    const handleEmailChangeRequest = async (e) => {
+        e.preventDefault();
+
+        if (!newEmailAddress) {
+            return toast.error('Enter a new email address first');
+        }
+
+        setIsUpdating(true);
+        try {
+            await requestEmailChange(newEmailAddress, emailChangePassword);
+            setNewEmailAddress('');
+            setEmailChangePassword('');
+        } catch (error) {
+            toast.error(error.message || 'Failed to request email change');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleResendVerification = async () => {
+        if (!user?.email) {
+            return;
+        }
+
+        try {
+            await resendVerificationEmail(user.email);
+        } catch (error) {
+            toast.error(error.message || 'Failed to resend verification email');
         }
     };
 
@@ -155,7 +188,15 @@ const Settings = () => {
                                     <div className="form-group">
                                         <label>Email Address</label>
                                         <input type="email" value={email} disabled />
-                                        <small>Email cannot be changed for security.</small>
+                                        <small>{user?.emailVerified ? 'Email verified.' : 'Email not verified yet.'}</small>
+                                        <div className={`verification-badge ${user?.emailVerified ? 'verified' : 'pending'}`}>
+                                            {user?.emailVerified ? 'Verified' : 'Pending verification'}
+                                        </div>
+                                        {!user?.emailVerified && user?.email && !String(user.email).endsWith('@phone.login') && (
+                                            <button type="button" className="link-button" onClick={handleResendVerification}>
+                                                Resend verification email
+                                            </button>
+                                        )}
                                     </div>
                                     <motion.button
                                         type="submit"
@@ -287,6 +328,45 @@ const Settings = () => {
                                         </motion.button>
                                     </form>
                                 </div>
+
+                                {user?.email && !String(user.email).endsWith('@phone.login') && (
+                                    <div className="security-section" style={{ marginTop: '3rem' }}>
+                                        <h3>Change Email Address</h3>
+                                        <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem' }}>
+                                            Request an email update. We will send a confirmation link to the new address.
+                                        </p>
+                                        <form className="settings-form" onSubmit={handleEmailChangeRequest}>
+                                            <div className="form-group">
+                                                <label>New Email Address</label>
+                                                <input
+                                                    type="email"
+                                                    placeholder="new-address@example.com"
+                                                    value={newEmailAddress}
+                                                    onChange={(e) => setNewEmailAddress(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Current Password</label>
+                                                <input
+                                                    type="password"
+                                                    placeholder="Enter current password"
+                                                    value={emailChangePassword}
+                                                    onChange={(e) => setEmailChangePassword(e.target.value)}
+                                                />
+                                                <small>Required for local email/password accounts.</small>
+                                            </div>
+                                            <motion.button
+                                                type="submit"
+                                                className="btn btn-primary"
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                disabled={isUpdating}
+                                            >
+                                                {isUpdating ? 'Sending...' : 'Send Email Change Link'}
+                                            </motion.button>
+                                        </form>
+                                    </div>
+                                )}
 
                                 <div className="security-section" style={{ marginTop: '3rem' }}>
                                     <h3>Two-Factor Authentication</h3>

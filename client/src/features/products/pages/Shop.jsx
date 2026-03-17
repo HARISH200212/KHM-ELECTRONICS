@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { useProducts } from '../../products/context/ProductContext';
 import { FiTag, FiHeadphones, FiTool, FiStar, FiSpeaker, FiBox, FiWifi, FiHome, FiWatch, FiChevronDown, FiChevronUp } from 'react-icons/fi';
@@ -20,7 +20,6 @@ const categoryConfig = {
 const Shop = () => {
     const { products } = useProducts();
     const location = useLocation();
-    const [searchParams] = useSearchParams();
     const [filter, setFilter] = useState('All');
     const [brandFilter, setBrandFilter] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
@@ -47,12 +46,20 @@ const Shop = () => {
 
         if (search) {
             setSearchTerm(search);
+            // Searching from navbar should not be constrained by stale shop filters.
+            if (!category) {
+                setFilter('All');
+                setBrandFilter('All');
+                setShowOnSaleOnly(false);
+            }
         } else {
             setSearchTerm('');
         }
 
         if (category) {
             setFilter(category);
+        } else if (!search) {
+            setFilter('All');
         }
     }, [location.search]);
 
@@ -82,8 +89,9 @@ const Shop = () => {
 
         if (searchTerm) {
             currentProducts = currentProducts.filter(p =>
-                p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                p.category.toLowerCase().includes(searchTerm.toLowerCase())
+                (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (p.category || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (p.brand || '').toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 
@@ -143,8 +151,9 @@ const Shop = () => {
 
         if (searchTerm) {
             currentProducts = currentProducts.filter(p =>
-                p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                p.category.toLowerCase().includes(searchTerm.toLowerCase())
+                (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (p.category || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (p.brand || '').toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 

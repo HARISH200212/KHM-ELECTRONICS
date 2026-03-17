@@ -291,7 +291,7 @@ const Orders = () => {
                                                         <div className="animated-truck">
                                                             <FaTruckMoving />
                                                         </div>
-                                                        <span style={{ position: 'absolute', bottom: '10px', right: '10px', fontSize: '10px', color: '#666', fontWeight: 'bold' }}>
+                                                        <span style={{ position: 'absolute', bottom: '10px', right: '10px', fontSize: '10px', color: 'var(--text-dim)', fontWeight: 'bold' }}>
                                                             Live GPS Active
                                                         </span>
                                                     </div>
@@ -299,11 +299,11 @@ const Orders = () => {
                                                 
                                                 {/* Cancel Button in Tracking View */}
                                                 {(order.status === 'Pending' || order.status === 'Processing') && (
-                                                    <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #333' }}>
-                                                        <p style={{ fontSize: '12px', color: '#ff4444', marginBottom: '8px' }}>Change your mind? You can still cancel this order.</p>
+                                                    <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid var(--border-light)' }}>
+                                                        <p style={{ fontSize: '12px', color: 'var(--primary)', marginBottom: '8px' }}>Change your mind? You can still cancel this order.</p>
                                                         <button 
                                                             className="amz-btn-small" 
-                                                            style={{ background: 'transparent', color: '#ff4444', border: '1px solid #ff4444' }}
+                                                            style={{ background: 'transparent', color: 'var(--primary)', border: '1px solid var(--primary)' }}
                                                             onClick={() => handleCancelOrder(order)}
                                                         >
                                                             Cancel this order
@@ -354,7 +354,7 @@ const Orders = () => {
                                                 {(order.status === 'Pending' || order.status === 'Processing') && (
                                                     <button 
                                                         className="amz-action-btn" 
-                                                        style={{ color: '#ff4444', borderColor: '#ff4444' }}
+                                                        style={{ color: 'var(--primary)', borderColor: 'var(--primary)' }}
                                                         onClick={() => handleCancelOrder(order)}
                                                     >
                                                         Cancel order
@@ -392,8 +392,8 @@ const Orders = () => {
                     <div className="amz-modal-overlay" onClick={() => setReviewModal(null)}>
                         <div className="amz-modal-content" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
                             <button className="amz-modal-close" onClick={() => setReviewModal(null)}>×</button>
-                            <h3 style={{ marginBottom: '0.5rem', color: '#e0e0e0' }}>Write a Review</h3>
-                            <p style={{ fontSize: '13px', color: '#aaa', marginBottom: '1rem' }}>
+                            <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-light)' }}>Write a Review</h3>
+                            <p style={{ fontSize: '13px', color: 'var(--text-dim)', marginBottom: '1rem' }}>
                                 {reviewModal.item?.name || reviewModal.item?.product?.name || 'Product'}
                             </p>
                             <form onSubmit={handleReviewSubmit}>
@@ -403,7 +403,7 @@ const Orders = () => {
                                             key={star}
                                             onClick={() => setReviewData(r => ({ ...r, rating: star }))}
                                             style={{ fontSize: '2rem', cursor: 'pointer',
-                                                color: star <= reviewData.rating ? 'var(--amazon-orange)' : '#555' }}
+                                                color: star <= reviewData.rating ? 'var(--amazon-orange)' : '#cbd5e1' }}
                                         >★</span>
                                     ))}
                                 </div>
@@ -413,7 +413,7 @@ const Orders = () => {
                                     value={reviewData.comment}
                                     onChange={e => setReviewData(r => ({ ...r, comment: e.target.value }))}
                                     style={{ width: '100%', padding: '10px', borderRadius: '6px', boxSizing: 'border-box',
-                                        background: '#1a1a1a', color: '#e0e0e0', border: '1px solid #444',
+                                        background: 'var(--bg-secondary)', color: 'var(--text-light)', border: '1px solid var(--border-light)',
                                         fontSize: '14px', resize: 'vertical' }}
                                 />
                                 <button type="submit" className="amz-btn" style={{ marginTop: '1rem', width: '100%', padding: '10px' }}>
@@ -429,8 +429,8 @@ const Orders = () => {
                     <div className="amz-modal-overlay" onClick={() => setCancellingOrder(null)}>
                         <div className="amz-modal-content" style={{ maxWidth: 450 }} onClick={e => e.stopPropagation()}>
                             <button className="amz-modal-close" onClick={() => setCancellingOrder(null)}>×</button>
-                            <h3 style={{ marginBottom: '1rem', color: '#e0e0e0' }}>Cancel Order</h3>
-                            <p style={{ fontSize: '14px', color: '#aaa', marginBottom: '1.5rem' }}>
+                            <h3 style={{ marginBottom: '1rem', color: 'var(--text-light)' }}>Cancel Order</h3>
+                            <p style={{ fontSize: '14px', color: 'var(--text-dim)', marginBottom: '1.5rem' }}>
                                 Please select a reason for cancelling this order:
                             </p>
                             
@@ -449,11 +449,11 @@ const Orders = () => {
                                         alignItems: 'center', 
                                         gap: '10px', 
                                         padding: '12px', 
-                                        background: cancelReason === reason ? '#222' : '#1a1a1a',
-                                        border: `1px solid ${cancelReason === reason ? 'var(--amazon-orange)' : '#333'}`,
+                                        background: cancelReason === reason ? 'var(--primary-subtle)' : 'var(--bg-secondary)',
+                                        border: `1px solid ${cancelReason === reason ? 'var(--amazon-orange)' : 'var(--border-light)'}`,
                                         borderRadius: '6px',
                                         cursor: 'pointer',
-                                        color: '#e0e0e0',
+                                        color: 'var(--text-light)',
                                         fontSize: '14px'
                                     }}>
                                         <input 
@@ -472,14 +472,14 @@ const Orders = () => {
                             <div style={{ display: 'flex', gap: '10px' }}>
                                 <button 
                                     className="amz-btn" 
-                                    style={{ flex: 1, background: '#333' }}
+                                    style={{ flex: 1, background: '#991b1b', color: '#fff' }}
                                     onClick={() => setCancellingOrder(null)}
                                 >
                                     Go Back
                                 </button>
                                 <button 
                                     className="amz-btn" 
-                                    style={{ flex: 1, background: '#ff4444' }}
+                                    style={{ flex: 1, background: 'var(--primary)', color: '#fff' }}
                                     onClick={handleConfirmCancel}
                                     disabled={!cancelReason}
                                 >
@@ -495,8 +495,8 @@ const Orders = () => {
                     <div className="amz-modal-overlay" onClick={() => setReturnExchangeModal(null)}>
                         <div className="amz-modal-content" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
                             <button className="amz-modal-close" onClick={() => setReturnExchangeModal(null)}>×</button>
-                            <h3 style={{ marginBottom: '0.5rem', color: '#e0e0e0' }}>Return or Replace Items</h3>
-                            <p style={{ fontSize: '13px', color: '#aaa', marginBottom: '1.2rem' }}>
+                            <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-light)' }}>Return or Replace Items</h3>
+                            <p style={{ fontSize: '13px', color: 'var(--text-dim)', marginBottom: '1.2rem' }}>
                                 Order #{returnExchangeModal.id || returnExchangeModal._id}
                             </p>
 
@@ -508,9 +508,9 @@ const Orders = () => {
                                         onClick={() => { setReturnExchangeType(type); setReturnReason(''); }}
                                         style={{
                                             flex: 1, padding: '10px', borderRadius: '6px', cursor: 'pointer',
-                                            background: returnExchangeType === type ? 'var(--amazon-orange, #f90)' : '#1a1a1a',
-                                            color: returnExchangeType === type ? '#000' : '#e0e0e0',
-                                            border: `1px solid ${returnExchangeType === type ? 'var(--amazon-orange, #f90)' : '#444'}`,
+                                            background: returnExchangeType === type ? 'var(--amazon-orange)' : 'var(--bg-secondary)',
+                                            color: returnExchangeType === type ? '#fff' : 'var(--text-light)',
+                                            border: `1px solid ${returnExchangeType === type ? 'var(--amazon-orange)' : 'var(--border-light)'}`,
                                             fontWeight: returnExchangeType === type ? '700' : '400',
                                             fontSize: '14px', textTransform: 'capitalize'
                                         }}
@@ -531,15 +531,15 @@ const Orders = () => {
                                 ).map(reason => (
                                     <label key={reason} style={{
                                         display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
-                                        background: returnReason === reason ? '#222' : '#1a1a1a',
-                                        border: `1px solid ${returnReason === reason ? 'var(--amazon-orange, #f90)' : '#333'}`,
-                                        borderRadius: '6px', cursor: 'pointer', color: '#e0e0e0', fontSize: '14px'
+                                        background: returnReason === reason ? 'var(--primary-subtle)' : 'var(--bg-secondary)',
+                                        border: `1px solid ${returnReason === reason ? 'var(--amazon-orange)' : 'var(--border-light)'}`,
+                                        borderRadius: '6px', cursor: 'pointer', color: 'var(--text-light)', fontSize: '14px'
                                     }}>
                                         <input
                                             type="radio" name="returnReason" value={reason}
                                             checked={returnReason === reason}
                                             onChange={() => setReturnReason(reason)}
-                                            style={{ accentColor: 'var(--amazon-orange, #f90)' }}
+                                            style={{ accentColor: 'var(--amazon-orange)' }}
                                         />
                                         {reason}
                                     </label>
@@ -547,7 +547,7 @@ const Orders = () => {
                             </div>
 
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                <button className="amz-btn" style={{ flex: 1, background: '#333' }} onClick={() => setReturnExchangeModal(null)}>
+                                <button className="amz-btn" style={{ flex: 1, background: '#991b1b', color: '#fff' }} onClick={() => setReturnExchangeModal(null)}>
                                     Go Back
                                 </button>
                                 <button

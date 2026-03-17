@@ -3,8 +3,20 @@ import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from '../../../shared/constants/api';
 
 const AuthContext = createContext();
+const AUTH_CHECK_TIMEOUT_MS = 8000;
+const LOGIN_FALLBACK_DELAY_MS = 1200;
 
 export const useAuth = () => useContext(AuthContext);
+
+const createApiError = (data, fallbackMessage) => {
+    const error = new Error(data?.message || fallbackMessage);
+
+    if (data && typeof data === 'object') {
+        Object.assign(error, data);
+    }
+
+    return error;
+};
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -14,16 +26,20 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            try {
-                // Check local storage first for quick response
-                const storedUser = localStorage.getItem('kh_user');
-                if (storedUser) {
-                    setUser(JSON.parse(storedUser));
-                }
+            const controller = new AbortController();
+            const fallbackTimer = setTimeout(() => {
+                setIsLoading(false);
+            }, LOGIN_FALLBACK_DELAY_MS);
 
+            const requestTimer = setTimeout(() => {
+                controller.abort();
+            }, AUTH_CHECK_TIMEOUT_MS);
+
+            try {
                 // Verify with backend session
                 const res = await fetch(`${API_URL}/login/success`, {
-                    credentials: "include"
+                    credentials: 'include',
+                    signal: controller.signal
                 });
                 const data = await res.json();
 
@@ -36,8 +52,14 @@ export const AuthProvider = ({ children }) => {
                     localStorage.removeItem('kh_user');
                 }
             } catch (err) {
-                console.error("Auth check failed:", err);
+                if (err.name !== 'AbortError') {
+                    console.error('Auth check failed:', err);
+                }
+
+                setUser(null);
             } finally {
+                clearTimeout(fallbackTimer);
+                clearTimeout(requestTimer);
                 setIsLoading(false);
             }
         };
@@ -50,6 +72,7 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ email, password })
             });
             const data = await res.json();
@@ -59,7 +82,7 @@ export const AuthProvider = ({ children }) => {
                 toast.success('Logged in successfully');
                 return data.user;
             } else {
-                throw new Error(data.message || 'Login failed');
+                throw createApiError(data, 'Login failed');
             }
         } catch (err) {
             toast.error(err.message);
@@ -72,16 +95,17 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ name, email, password })
             });
             const data = await res.json();
             if (res.ok) {
-                setUser(data.user);
-                localStorage.setItem('kh_user', JSON.stringify(data.user));
-                toast.success('Account created successfully');
-                return data.user;
+                setUser(null);
+                localStorage.removeItem('kh_user');
+                toast.success(data.message || 'Account created successfully');
+                return data;
             } else {
-                throw new Error(data.message || 'Registration failed');
+                throw createApiError(data, 'Registration failed');
             }
         } catch (err) {
             toast.error(err.message);
@@ -113,12 +137,144 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('kh_user', JSON.stringify(data.user));
                 return data.user;
             } else {
-                throw new Error(data.message || 'Profile update failed');
+                throw createApiError(data, 'Profile update failed');
             }
         } catch (err) {
             console.error("Profile update failed:", err);
             throw err;
         }
+    };
+
+    const resendVerificationEmail = async (email) => {
+        try {
+            const res = await fetch(`${API_URL}/resend-verification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(data.message || 'Verification email sent');
+                return data;
+            }
+
+            throw createApiError(data, 'Failed to resend verification email');
+        } catch (err) {
+            toast.error(err.message);
+            throw err;
+        }
+    };
+
+    const verifyEmailToken = async (token) => {
+        const res = await fetch(`${API_URL}/verify-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ token })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw createApiError(data, 'Failed to verify email');
+        }
+
+        return data;
+    };
+
+    const forgotPassword = async (email) => {
+        try {
+            const res = await fetch(`${API_URL}/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(data.message || 'Password reset email sent');
+                return data;
+            }
+
+            throw createApiError(data, 'Failed to request password reset');
+        } catch (err) {
+            toast.error(err.message);
+            throw err;
+        }
+    };
+
+    const resetPasswordWithToken = async (token, newPassword) => {
+        const res = await fetch(`${API_URL}/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ token, newPassword })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw createApiError(data, 'Failed to reset password');
+        }
+
+        return data;
+    };
+
+    const forgotEmail = async (phone) => {
+        try {
+            const res = await fetch(`${API_URL}/forgot-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ phone })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(data.message || 'Email reminder sent');
+                return data;
+            }
+
+            throw createApiError(data, 'Failed to find email address');
+        } catch (err) {
+            toast.error(err.message);
+            throw err;
+        }
+    };
+
+    const requestEmailChange = async (newEmail, currentPassword) => {
+        try {
+            const res = await fetch(`${API_URL}/email-change/request`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ newEmail, currentPassword })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(data.message || 'Email change request sent');
+                return data;
+            }
+
+            throw createApiError(data, 'Failed to request email change');
+        } catch (err) {
+            toast.error(err.message);
+            throw err;
+        }
+    };
+
+    const confirmEmailChange = async (token) => {
+        const res = await fetch(`${API_URL}/email-change/confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ token })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw createApiError(data, 'Failed to confirm email change');
+        }
+
+        return data;
     };
 
     const logout = async () => {
@@ -141,6 +297,7 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch(`${API_URL}/send-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ phone })
             });
             const data = await res.json();
@@ -163,6 +320,7 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch(`${API_URL}/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ phone, otp })
             });
             const data = await res.json();
@@ -181,7 +339,24 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, updateProfile, socialLogin, logout, sendOtp, verifyOtp, isLoading }}>
+        <AuthContext.Provider value={{
+            user,
+            login,
+            register,
+            updateProfile,
+            socialLogin,
+            logout,
+            sendOtp,
+            verifyOtp,
+            resendVerificationEmail,
+            verifyEmailToken,
+            forgotPassword,
+            resetPasswordWithToken,
+            forgotEmail,
+            requestEmailChange,
+            confirmEmailChange,
+            isLoading
+        }}>
             {children}
         </AuthContext.Provider>
     );

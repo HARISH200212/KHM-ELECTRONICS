@@ -11,7 +11,7 @@
 
 .settings-sidebar {
     background: var(--bg-card);
-    border: 1px solid var(--border-glass);
+    border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
     padding: 1.5rem;
     height: fit-content;
@@ -32,8 +32,8 @@
 }
 
 .sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-white);
+    background: var(--primary-subtle);
+    color: var(--primary);
 }
 
 .sidebar-item.active {
@@ -49,7 +49,7 @@
 
 .settings-section {
     background: var(--bg-card);
-    border: 1px solid var(--border-glass);
+    border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
     padding: 2.5rem;
 }
@@ -76,9 +76,9 @@
 }
 
 .change-photo-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-glass);
-    color: var(--text-white);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    color: var(--text-light);
     padding: 10px 20px;
     border-radius: var(--radius-md);
     display: flex;
@@ -111,7 +111,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 0;
-    border-bottom: 1px solid var(--border-glass);
+    border-bottom: 1px solid var(--border-light);
 }
 
 .toggle-group:last-child {
@@ -132,7 +132,7 @@
 .toggle-switch {
     width: 50px;
     height: 26px;
-    background: rgba(255, 255, 255, 0.1);
+    background: #fecaca;
     border-radius: 30px;
     position: relative;
     cursor: pointer;
@@ -166,13 +166,13 @@
 .security-section h3 {
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
-    color: var(--text-white);
+    color: var(--text-light);
 }
 
 .security-section h4 {
     font-size: 0.95rem;
     margin-bottom: 4px;
-    color: var(--text-white);
+    color: var(--text-light);
 }
 
 .session-item {
@@ -180,15 +180,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-glass);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
     border-radius: var(--radius-md);
 }
 
 .btn-danger {
-    background: rgba(0, 242, 255, 0.1);
-    color: var(--error);
-    border: 1px solid var(--error);
+    background: rgba(220, 38, 38, 0.08);
+    color: var(--primary);
+    border: 1px solid var(--primary);
     padding: 12px 28px;
     border-radius: var(--radius-md);
     font-weight: 700;
@@ -196,8 +196,44 @@
 }
 
 .btn-danger:hover {
-    background: rgba(0, 242, 255, 0.2);
-    box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+    background: rgba(220, 38, 38, 0.16);
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.18);
+}
+
+.verification-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    padding: 6px 10px;
+}
+
+.verification-badge.verified {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.verification-badge.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.link-button {
+    background: transparent;
+    border: 0;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.75rem;
+    padding: 0;
+    text-align: left;
+}
+
+.link-button:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {

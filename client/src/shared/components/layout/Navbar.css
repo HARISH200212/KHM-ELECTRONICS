@@ -89,7 +89,7 @@
 
 .search-btn {
     background: var(--primary-gradient);
-    color: #000;
+    color: #fff;
     padding: 0 25px;
     font-size: 1.1rem;
     transition: var(--transition-smooth);
@@ -140,7 +140,7 @@
     top: -8px;
     right: -10px;
     background: var(--primary-gradient);
-    color: #000;
+    color: #fff;
     font-size: 0.7rem;
     font-weight: 700;
     width: 20px;
@@ -171,7 +171,7 @@
     padding: 12px 25px;
     border-radius: 25px 25px 0 0;
     font-weight: 700;
-    color: #000;
+    color: #fff;
     width: 240px;
     text-align: left;
 }

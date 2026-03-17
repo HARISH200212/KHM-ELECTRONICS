@@ -10,6 +10,7 @@ import Cart from './features/cart/pages/Cart';
 import Checkout from './features/cart/pages/Checkout';
 import Settings from './features/profile/pages/Settings';
 import Login from './features/auth/pages/Login';
+import AuthAction from './features/auth/pages/AuthAction';
 import Profile from './features/profile/pages/Profile';
 import Orders from './features/orders/pages/Orders';
 import Wishlist from './features/wishlist/pages/Wishlist';
@@ -31,9 +32,11 @@ import AuthGuard from './shared/components/routing/AuthGuard';
 import AdminPrivateRoute from './features/admin/components/AdminPrivateRoute';
 import RoamingLogo from './shared/components/ui/RoamingLogo';
 import { API_BASE_URL } from './shared/constants/api';
+import { useAuth } from './features/auth/context/AuthContext';
 
 function App() {
   const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
     const socket = io(API_BASE_URL);
@@ -82,7 +85,11 @@ function App() {
   return (
     <>
       <Routes >
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={user && !isLoading ? <Navigate to="/" replace /> : <Login />}
+        />
+        <Route path="/auth/action" element={<AuthAction />} />
 
         {/* Storefront Routes - Protected by default */}
         <Route element={<AuthGuard />}>

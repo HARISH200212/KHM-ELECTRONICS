@@ -11,6 +11,13 @@ router.use((req, res, next) => {
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.post("/forgot-password", authController.forgotPassword);
+router.post("/reset-password", authController.resetPassword);
+router.post("/forgot-email", authController.forgotEmail);
+router.post("/resend-verification", authController.resendVerificationEmail);
+router.post("/verify-email", authController.verifyEmail);
+router.post("/email-change/request", authController.requestEmailChange);
+router.post("/email-change/confirm", authController.confirmEmailChange);
 router.post("/send-otp", authController.sendOtp);
 router.post("/verify-otp", authController.verifyOtp);
 router.post("/google", authController.googleLogin);

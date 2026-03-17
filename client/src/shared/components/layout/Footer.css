@@ -23,18 +23,18 @@
 
 .support-icon {
     font-size: 2rem;
-    color: #000;
+    color: #fff;
 }
 
 .support-text strong {
     display: block;
     font-size: 1.2rem;
-    color: #000;
+    color: #fff;
 }
 
 .support-text span {
     font-size: 0.85rem;
-    color: #1a1a1a;
+    color: #ffe4e6;
 }
 
 .support-newsletter {
@@ -60,16 +60,16 @@
 }
 
 .support-newsletter button {
-    background: var(--bg-dark);
-    color: var(--text-olive);
+    background: var(--primary);
+    color: #fff;
     padding: 8px 25px;
     border-radius: 20px;
     transition: var(--transition-smooth);
 }
 
 .support-newsletter button:hover {
-    background: #000;
-    color: var(--primary);
+    background: var(--primary-hover);
+    color: #fff;
 }
 
 .footer-main {

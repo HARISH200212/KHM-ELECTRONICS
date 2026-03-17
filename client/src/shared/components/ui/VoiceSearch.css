@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(255, 255, 255, 0.82);
     backdrop-filter: blur(10px);
     z-index: 2000;
     display: flex;
@@ -18,9 +18,9 @@
     max-width: 600px;
     padding: 2.5rem;
     border: 1px solid var(--primary);
-    box-shadow: 0 0 50px rgba(0, 255, 65, 0.2);
+    box-shadow: 0 0 40px rgba(220, 38, 38, 0.2);
     position: relative;
-    background: rgba(5, 5, 5, 0.95);
+    background: var(--bg-card);
     z-index: 2001;
 }
 
@@ -67,6 +67,7 @@
     text-align: center;
     margin-bottom: 2rem;
     letter-spacing: 2px;
+    color: var(--text-light);
 }
 
 .status-listening {
@@ -75,7 +76,7 @@
 }
 
 .status-final {
-    color: var(--secondary);
+    color: var(--text-light);
 }
 
 .status-ready {
@@ -101,11 +102,11 @@
     width: 6px;
     background: var(--primary);
     border-radius: 3px;
-    box-shadow: 0 0 10px var(--primary);
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.35);
 }
 
 .transcript-display {
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--bg-secondary);
     padding: 1.5rem;
     border-radius: 8px;
     font-family: 'monospace';
@@ -159,8 +160,8 @@
 
 .voice-btn.start {
     background: var(--primary);
-    color: black;
-    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
 }
 
 .voice-btn.stop {

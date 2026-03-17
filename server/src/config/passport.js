@@ -78,6 +78,7 @@ passport.use(
                     if (!user.googleId) {
                         user.googleId = profile.id;
                         user.avatar = user.avatar || profile.photos[0].value;
+                        user.emailVerified = true;
                         await user.save();
                     }
                     return done(null, user);
@@ -88,7 +89,8 @@ passport.use(
                     name: profile.displayName,
                     email: email,
                     avatar: profile.photos[0].value,
-                    provider: 'google'
+                    provider: 'google',
+                    emailVerified: true
                 });
 
                 return done(null, user);
@@ -121,6 +123,7 @@ passport.use(
                     if (!user.facebookId) {
                         user.facebookId = profile.id;
                         user.avatar = user.avatar || (profile.photos ? profile.photos[0].value : null);
+                        user.emailVerified = true;
                         await user.save();
                     }
                     return done(null, user);
@@ -131,7 +134,8 @@ passport.use(
                     name: profile.displayName,
                     email: email,
                     avatar: profile.photos ? profile.photos[0].value : null,
-                    provider: 'facebook'
+                    provider: 'facebook',
+                    emailVerified: true
                 });
 
                 return done(null, user);
