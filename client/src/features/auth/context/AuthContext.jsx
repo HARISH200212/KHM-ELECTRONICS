@@ -18,6 +18,21 @@ const createApiError = (data, fallbackMessage) => {
     return error;
 };
 
+const readJsonResponse = async (response, fallbackMessage) => {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+        return response.json();
+    }
+
+    const responseText = await response.text();
+    const error = new Error(fallbackMessage);
+    error.status = response.status;
+    error.contentType = contentType;
+    error.responseText = responseText;
+    throw error;
+};
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -227,7 +242,10 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify({ phone })
             });
-            const data = await res.json();
+            const data = await readJsonResponse(
+                res,
+                'Unexpected server response while looking up your email. Check the API URL configuration.'
+            );
             if (res.ok) {
                 toast.success(data.message || 'Email reminder sent');
                 return data;

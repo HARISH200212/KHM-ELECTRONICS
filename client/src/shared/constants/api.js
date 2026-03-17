@@ -8,7 +8,31 @@ const ensureProtocol = (url) => {
     return `https://${url}`;
 };
 
-const normalizeUrl = (url) => ensureProtocol(url).replace(/\/+$/, '');
+const stripApiSuffix = (pathname = '') => {
+    const trimmedPath = pathname.replace(/\/+$/, '');
+
+    if (!trimmedPath) {
+        return '';
+    }
+
+    return trimmedPath.replace(/\/api(?:\/.*)?$/i, '');
+};
+
+const normalizeUrl = (url) => {
+    const normalized = ensureProtocol(url).replace(/\/+$/, '');
+
+    if (!normalized) {
+        return '';
+    }
+
+    try {
+        const parsedUrl = new URL(normalized);
+        const basePath = stripApiSuffix(parsedUrl.pathname);
+        return `${parsedUrl.origin}${basePath}`.replace(/\/+$/, '');
+    } catch (_err) {
+        return normalized;
+    }
+};
 
 const productionFallbackApiUrl = 'https://ecombackend-tcey.onrender.com';
 
