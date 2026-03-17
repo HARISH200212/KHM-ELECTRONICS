@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify({ email, password })
             });
-            const data = await res.json();
+            const data = await readJsonResponse(res, 'Login failed. The server returned an unexpected response.');
             if (res.ok) {
                 setUser(data.user);
                 localStorage.setItem('kh_user', JSON.stringify(data.user));
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify({ name, email, password })
             });
-            const data = await res.json();
+            const data = await readJsonResponse(res, 'Registration failed. The server returned an unexpected response.');
             if (res.ok) {
                 setUser(null);
                 localStorage.removeItem('kh_user');
@@ -146,7 +146,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify(updates)
             });
-            const data = await res.json();
+            const data = await readJsonResponse(res, 'Profile update failed. The server returned an unexpected response.');
             if (res.ok) {
                 setUser(data.user);
                 localStorage.setItem('kh_user', JSON.stringify(data.user));
@@ -168,7 +168,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify({ email })
             });
-            const data = await res.json();
+            const data = await readJsonResponse(res, 'Failed to resend verification email. The server returned an unexpected response.');
             if (res.ok) {
                 toast.success(data.message || 'Verification email sent');
                 return data;
@@ -188,7 +188,7 @@ export const AuthProvider = ({ children }) => {
             credentials: 'include',
             body: JSON.stringify({ token })
         });
-        const data = await res.json();
+        const data = await readJsonResponse(res, 'Failed to verify email. The server returned an unexpected response.');
 
         if (!res.ok) {
             throw createApiError(data, 'Failed to verify email');
@@ -205,7 +205,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify({ email })
             });
-            const data = await res.json();
+            const data = await readJsonResponse(res, 'Failed to request password reset. The server returned an unexpected response.');
             if (res.ok) {
                 toast.success(data.message || 'Password reset email sent');
                 return data;
@@ -225,7 +225,7 @@ export const AuthProvider = ({ children }) => {
             credentials: 'include',
             body: JSON.stringify({ token, newPassword })
         });
-        const data = await res.json();
+        const data = await readJsonResponse(res, 'Failed to reset password. The server returned an unexpected response.');
 
         if (!res.ok) {
             throw createApiError(data, 'Failed to reset password');
@@ -266,7 +266,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify({ newEmail, currentPassword })
             });
-            const data = await res.json();
+            const data = await readJsonResponse(res, 'Failed to request email change. The server returned an unexpected response.');
             if (res.ok) {
                 toast.success(data.message || 'Email change request sent');
                 return data;
@@ -286,7 +286,7 @@ export const AuthProvider = ({ children }) => {
             credentials: 'include',
             body: JSON.stringify({ token })
         });
-        const data = await res.json();
+        const data = await readJsonResponse(res, 'Failed to confirm email change. The server returned an unexpected response.');
 
         if (!res.ok) {
             throw createApiError(data, 'Failed to confirm email change');
@@ -318,7 +318,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify({ phone })
             });
-            const data = await res.json();
+            const data = await readJsonResponse(res, 'Failed to send OTP. The server returned an unexpected response.');
             if (res.ok) {
                 if (!data.devOtp) {
                     toast.success('OTP sent to your phone!');
@@ -341,7 +341,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: 'include',
                 body: JSON.stringify({ phone, otp })
             });
-            const data = await res.json();
+            const data = await readJsonResponse(res, 'Failed to verify OTP. The server returned an unexpected response.');
             if (res.ok) {
                 setUser(data.user);
                 localStorage.setItem('kh_user', JSON.stringify(data.user));
