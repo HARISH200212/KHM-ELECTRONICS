@@ -3,7 +3,7 @@ import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from '../../../shared/constants/api';
 
-const CheckoutForm = ({ amount, customerEmail, onPaymentSuccess, onRealtimeStatus }) => {
+const CheckoutForm = ({ amount, customerEmail, onPaymentSuccess, onPaymentProcessing, onRealtimeStatus }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [message, setMessage] = useState(null);
@@ -34,6 +34,10 @@ const CheckoutForm = ({ amount, customerEmail, onPaymentSuccess, onRealtimeStatu
             }
 
             const { clientSecret, paymentIntentId } = data;
+            
+            // Show payment processing screen
+            onPaymentProcessing?.(paymentIntentId, 'card');
+            
             onRealtimeStatus?.({
                 paymentIntentId,
                 status: 'processing',

@@ -1,5 +1,23 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
+exports.getStripeConfig = async (_req, res) => {
+    try {
+        const publishableKey = (process.env.STRIPE_PUBLISHABLE_KEY || "").trim();
+
+        return res.status(200).json({
+            success: true,
+            publishableKey,
+            configured: Boolean(publishableKey),
+        });
+    } catch (err) {
+        console.error("Stripe config error:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load Stripe config",
+        });
+    }
+};
+
 exports.createPaymentIntent = async (req, res) => {
     try {
         const { amount, currency, customerEmail } = req.body;

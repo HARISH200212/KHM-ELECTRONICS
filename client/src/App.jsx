@@ -27,6 +27,7 @@ import AdminOrders from './features/admin/pages/AdminOrders';
 import AdminOrderDetails from './features/admin/pages/AdminOrderDetails';
 import AdminCustomers from './features/admin/pages/AdminCustomers';
 import AdminCustomerDetails from './features/admin/pages/AdminCustomerDetails';
+import AdminProfile from './features/admin/pages/AdminProfile';
 
 import AuthGuard from './shared/components/routing/AuthGuard';
 import AdminPrivateRoute from './features/admin/components/AdminPrivateRoute';
@@ -128,7 +129,9 @@ function App() {
             <Route path="orders/:id" element={<AdminOrderDetails />} />
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="customers/:email" element={<AdminCustomerDetails />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="profile" element={<AdminProfile />} />
+            <Route path="profile/:profileId" element={<AdminProfile />} />
+            <Route path="settings" element={<Navigate to="/admin/profile" replace />} />
           </Route>
         </Route>
       </Routes >

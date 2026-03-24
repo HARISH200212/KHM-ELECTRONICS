@@ -92,7 +92,7 @@ const AdminDashboard = () => {
         { to: '/admin/products', icon: <FaBoxOpen />, label: 'Manage Products', note: 'Edit stock, pricing, catalog' },
         { to: '/admin/products/add', icon: <FaPlusCircle />, label: 'Add Product', note: 'Create new listing' },
         { to: '/admin/customers', icon: <FaUsers />, label: 'Customers', note: 'Browse and inspect users' },
-        { to: '/admin/settings', icon: <FaCog />, label: 'Admin Settings', note: 'Configuration and account' },
+        { to: '/admin/profile', icon: <FaCog />, label: 'Admin Profile', note: 'Open and manage any admin profile' },
     ];
 
     const filteredRecentOrders = useMemo(() => {

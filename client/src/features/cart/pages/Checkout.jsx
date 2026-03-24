@@ -9,6 +9,7 @@ import { FaCreditCard, FaQrcode, FaMoneyBillWave, FaLock } from 'react-icons/fa'
 import io from 'socket.io-client';
 import StripePayment from '../components/StripePayment';
 import PaymentLoader from '../../../shared/components/ui/PaymentLoader';
+import PaymentProcessingScreen from '../../../shared/components/ui/PaymentProcessingScreen';
 import UPIScannerModal from '../components/UPIScannerModal';
 import { API_BASE_URL } from '../../../shared/constants/api';
 import './Checkout.css';
@@ -38,6 +39,12 @@ const Checkout = () => {
     const [showPaymentLoader, setShowPaymentLoader] = useState(false);
     const [showUPIScanner, setShowUPIScanner] = useState(false);
     const [livePaymentStatus, setLivePaymentStatus] = useState('idle');
+    const [showPaymentProcessing, setShowPaymentProcessing] = useState(false);
+    const [paymentProcessingData, setPaymentProcessingData] = useState({
+        status: 'idle',
+        transactionId: null,
+        errorMessage: null
+    });
 
     // Redirect if cart is empty and no direct buy item
     useEffect(() => {
@@ -122,11 +129,55 @@ const Checkout = () => {
         navigate('/order-confirmation', { state: { order: { id: finalOrderId, status: 'success' } } });
     };
 
+    const handlePaymentProcessing = (transactionId, method) => {
+        setPaymentProcessingData({
+            status: 'processing',
+            transactionId,
+            errorMessage: null
+        });
+        setShowPaymentProcessing(true);
+    };
+
     const handlePaymentSuccess = async (paymentData) => {
-        await processOrderCompletion('Stripe Card', 'Paid', paymentData.id);
+        setPaymentProcessingData(prev => ({
+            ...prev,
+            status: 'succeeded',
+            transactionId: paymentData.id
+        }));
+        setTimeout(() => {
+            setShowPaymentProcessing(false);
+            processOrderCompletion('Stripe Card', 'Paid', paymentData.id);
+        }, 1500);
+    };
+
+    const handlePaymentError = (errorMessage, transactionId) => {
+        setPaymentProcessingData({
+            status: 'failed',
+            transactionId,
+            errorMessage
+        });
+    };
+
+    const handlePaymentRetry = () => {
+        setPaymentProcessingData({
+            status: 'idle',
+            transactionId: null,
+            errorMessage: null
+        });
+        setShowPaymentProcessing(false);
+    };
+
+    const handlePaymentClose = () => {
+        setShowPaymentProcessing(false);
+        setPaymentProcessingData({
+            status: 'idle',
+            transactionId: null,
+            errorMessage: null
+        });
     };
 
     const handleUPIPaymentInitiate = () => {
+        handlePaymentProcessing(`UPI-${Date.now()}`, 'upi');
         setShowPaymentLoader(true);
     };
 
@@ -137,13 +188,20 @@ const Checkout = () => {
 
     const handleUPIConfirmed = async () => {
         setShowUPIScanner(false);
-        const upiTxnId = 'UPI-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        setPaymentProcessingData(prev => ({
+            ...prev,
+            status: 'succeeded'
+        }));
+        const upiTxnId = paymentProcessingData.transactionId;
         await sendPaymentRealtimeStatus({
             paymentIntentId: upiTxnId,
             status: 'succeeded',
             metadata: { method: 'UPI' },
         });
-        await processOrderCompletion('UPI', 'Paid', upiTxnId);
+        setTimeout(() => {
+            setShowPaymentProcessing(false);
+            processOrderCompletion('UPI', 'Paid', upiTxnId);
+        }, 1500);
     };
 
     const handleFinalSubmit = () => {
@@ -161,15 +219,23 @@ const Checkout = () => {
         }
 
         // Cash on Delivery
-        setIsProcessing(true);
+        const codTxnId = `COD-${Date.now()}`;
+        handlePaymentProcessing(codTxnId, 'cod');
         setTimeout(async () => {
+            setPaymentProcessingData(prev => ({
+                ...prev,
+                status: 'pending'
+            }));
             await sendPaymentRealtimeStatus({
-                paymentIntentId: `COD-${Date.now()}`,
+                paymentIntentId: codTxnId,
                 status: 'pending',
                 metadata: { method: 'Cash on Delivery' },
             });
-            await processOrderCompletion('Cash on Delivery', 'Pending');
-        }, 2000);
+            setTimeout(() => {
+                setShowPaymentProcessing(false);
+                processOrderCompletion('Cash on Delivery', 'Pending', codTxnId);
+            }, 1500);
+        }, 1000);
     };
 
     return (
@@ -246,6 +312,7 @@ const Checkout = () => {
                                                                 amount={checkoutTotal}
                                                                 customerEmail={formData.email}
                                                                 onPaymentSuccess={handlePaymentSuccess}
+                                                                onPaymentProcessing={handlePaymentProcessing}
                                                                 onRealtimeStatus={sendPaymentRealtimeStatus}
                                                             />
                                                         </div>
@@ -378,6 +445,16 @@ const Checkout = () => {
 
             {/* Payment Loader & Modals */}
             <PaymentLoader isVisible={showPaymentLoader} onComplete={handleLoaderComplete} />
+            <PaymentProcessingScreen
+                isVisible={showPaymentProcessing}
+                paymentMethod={paymentMethod}
+                amount={checkoutTotal}
+                status={paymentProcessingData.status}
+                transactionId={paymentProcessingData.transactionId}
+                errorMessage={paymentProcessingData.errorMessage}
+                onRetry={handlePaymentRetry}
+                onClose={handlePaymentClose}
+            />
             <UPIScannerModal
                 isVisible={showUPIScanner}
                 amount={checkoutTotal}

@@ -78,12 +78,13 @@ const UPIScannerModal = ({ isVisible, amount, onClose, onPaymentComplete }) => {
                             <ol>
                                 <li>Open any UPI App (PhonePe, Google Pay, Paytm, etc.)</li>
                                 <li>Scan the QR code shown above</li>
-                                <li>Enter your UPI PIN to complete payment</li>
+                                <li>Enter your UPI PIN to complete payment in your app</li>
+                                <li>Return here and confirm after payment is successful</li>
                             </ol>
                         </div>
 
                         <button className="btn btn-confirm" onClick={onPaymentComplete}>
-                            Simulate Payment Success
+                            I Have Completed Payment
                         </button>
                     </motion.div>
                 </div>

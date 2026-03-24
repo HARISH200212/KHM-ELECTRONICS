@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { 
     FaChartPie, 
     FaShoppingCart, 
@@ -32,9 +32,9 @@ const AdminSidebar = ({ onLogout }) => {
                     <FaUsers className="nav-icon" />
                     <span>Customers</span>
                 </NavLink>
-                <NavLink to="/admin/settings" className={({ isActive }) => `nav-link-modern ${isActive ? 'active' : ''}`}>
+                <NavLink to="/admin/profile" className={({ isActive }) => `nav-link-modern ${isActive ? 'active' : ''}`}>
                     <FaCog className="nav-icon" />
-                    <span>Settings</span>
+                    <span>Profile</span>
                 </NavLink>
             </nav>
 

@@ -1,0 +1,428 @@
+/* ========================
+   Payment Processing Screen
+   ======================== */
+
+.payment-processing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.payment-processing-card {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header with Color Coding */
+.processing-header {
+    padding: 2.5rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+
+    &.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    &.processing {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    &.success {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    &.error {
+        background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+    }
+
+    &.warning {
+        background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%);
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1), transparent);
+        pointer-events: none;
+    }
+}
+
+.processing-icon {
+    font-size: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease-out;
+    position: relative;
+    z-index: 1;
+}
+
+.processing-icon .spinner {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.processing-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Main Content Area */
+.processing-content {
+    padding: 2rem;
+}
+
+.amount-section {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f7fafc;
+    border-radius: 10px;
+}
+
+.amount-label {
+    font-size: 0.85rem;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.amount-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0;
+    margin-top: 0.5rem;
+
+    &.primary {
+        color: #667eea;
+    }
+    &.processing {
+        color: #f5576c;
+    }
+    &.success {
+        color: #48bb78;
+    }
+    &.error {
+        color: #f56565;
+    }
+    &.warning {
+        color: #ecc94b;
+    }
+}
+
+/* Payment Details */
+.payment-details {
+    background: #edf2f7;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.detail-label {
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.detail-value {
+    color: #2d3748;
+    font-weight: 500;
+}
+
+.detail-value.txn-id {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: #667eea;
+    word-break: break-all;
+}
+
+/* Status Message */
+.status-message {
+    text-align: center;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+
+    &.primary {
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+    &.processing {
+        color: #f5576c;
+        background: rgba(245, 87, 108, 0.1);
+    }
+    &.success {
+        color: #48bb78;
+        background: rgba(72, 187, 120, 0.1);
+    }
+    &.error {
+        color: #f56565;
+        background: rgba(245, 101, 101, 0.1);
+    }
+    &.warning {
+        color: #d69e2e;
+        background: rgba(214, 158, 46, 0.1);
+    }
+}
+
+/* Progress Bar */
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+}
+
+/* Success Checkmark */
+.success-checkmark {
+    width: 80px;
+    height: 80px;
+    margin: 1.5rem auto;
+    background: rgba(72, 187, 120, 0.1);
+    border: 3px solid #48bb78;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #48bb78;
+    font-weight: bold;
+}
+
+/* Error Alert */
+.error-alert {
+    background: #fff5f5;
+    border-left: 4px solid #f56565;
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    color: #c53030;
+    font-size: 0.9rem;
+
+    .fa-exclamation-triangle {
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    p {
+        margin: 0;
+        line-height: 1.4;
+    }
+}
+
+/* Security Info */
+.security-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+
+    .lock-icon {
+        font-size: 0.9rem;
+        color: #48bb78;
+    }
+}
+
+/* Action Buttons */
+.processing-actions {
+    padding: 1.5rem 2rem;
+    background: #f7fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.button-group {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    width: 100%;
+}
+
+.btn-retry {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-cancel {
+    background: #e2e8f0;
+    color: #4a5568;
+
+    &:hover {
+        background: #cbd5e0;
+    }
+}
+
+.btn-pending {
+    background: #ecc94b;
+    color: #744210;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .payment-processing-card {
+        border-radius: 0;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .processing-header {
+        padding: 2rem 1.5rem;
+    }
+
+    .processing-icon {
+        font-size: 3rem;
+    }
+
+    .processing-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .processing-content {
+        padding: 1.5rem;
+    }
+
+    .amount-value {
+        font-size: 2rem;
+    }
+
+    .processing-actions {
+        padding: 1rem 1.5rem;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+}
+
+/* Animation for fadeIn */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
