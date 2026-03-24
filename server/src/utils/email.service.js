@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const getClientUrl = () => {
     const raw = (process.env.CLIENT_URL || 'http://localhost:5173').trim();
@@ -21,6 +22,8 @@ const getClientUrl = () => {
 };
 
 const senderAddress = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+const resendClient = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const useResendProvider = String(process.env.EMAIL_PROVIDER || '').trim().toLowerCase() === 'resend';
 
 const buildTransportConfig = () => {
     const auth = {
@@ -51,6 +54,14 @@ const buildTransportConfig = () => {
 
 const transporter = nodemailer.createTransport(buildTransportConfig());
 
+const isResendConfigured = () => {
+    return Boolean(resendClient && senderAddress);
+};
+
+const isSmtpConfigured = () => {
+    return Boolean(senderAddress && process.env.EMAIL_PASS && (process.env.EMAIL_SERVICE || process.env.EMAIL_HOST));
+};
+
 const getOrderId = (order = {}) => {
     const raw = order._id || order.id;
     return raw ? String(raw) : `ORD-${Date.now()}`;
@@ -67,7 +78,30 @@ const getOrderTotal = (order = {}) => {
 };
 
 const isEmailConfigured = () => {
-    return Boolean(senderAddress && process.env.EMAIL_PASS && (process.env.EMAIL_SERVICE || process.env.EMAIL_HOST));
+    return isResendConfigured() || isSmtpConfigured();
+};
+
+const normalizeRecipients = (value) => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value.filter(Boolean);
+    return [value];
+};
+
+const sendViaResend = async (mailOptions) => {
+    const to = normalizeRecipients(mailOptions.to);
+    const cc = normalizeRecipients(mailOptions.cc);
+    const bcc = normalizeRecipients(mailOptions.bcc);
+
+    return resendClient.emails.send({
+        from: mailOptions.from || senderAddress,
+        to,
+        cc: cc.length ? cc : undefined,
+        bcc: bcc.length ? bcc : undefined,
+        replyTo: mailOptions.replyTo,
+        subject: mailOptions.subject,
+        html: mailOptions.html,
+        text: mailOptions.text,
+    });
 };
 
 const saveFallbackEmail = (fileName, html) => {
@@ -80,24 +114,48 @@ const sendMailWithFallback = async ({ mailOptions, fallbackFileName, html, logLa
     if (!isEmailConfigured()) {
         const fallbackPath = saveFallbackEmail(fallbackFileName, html);
         console.error(`[Email ERROR] ${logLabel} not sent to ${mailOptions.to}. Email service NOT CONFIGURED.`);
-        console.error(`[Email DEBUG] EMAIL_FROM: ${senderAddress}, EMAIL_HOST: ${process.env.EMAIL_HOST}, EMAIL_USER: ${process.env.EMAIL_USER}`);
+        console.error(`[Email DEBUG] EMAIL_PROVIDER: ${process.env.EMAIL_PROVIDER || 'smtp'}, EMAIL_FROM: ${senderAddress}, EMAIL_HOST: ${process.env.EMAIL_HOST}, EMAIL_USER: ${process.env.EMAIL_USER}, RESEND_API_KEY: ${process.env.RESEND_API_KEY ? 'set' : 'missing'}`);
         console.error(`[Email] Preview saved to ${fallbackPath}`);
         return { delivered: false, fallbackPath };
     }
 
     try {
-        console.log(`[Email] Attempting to send ${logLabel} to ${mailOptions.to}...`);
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`[Email SUCCESS] ${logLabel} sent to ${mailOptions.to}`);
-        console.log(`[Email] Message ID: ${info.messageId}`);
-        return { delivered: true, messageId: info.messageId };
+        if (useResendProvider && isResendConfigured()) {
+            console.log(`[Email] Attempting to send ${logLabel} to ${mailOptions.to} via Resend...`);
+            const info = await sendViaResend(mailOptions);
+            const messageId = info?.data?.id || info?.id;
+            console.log(`[Email SUCCESS] ${logLabel} sent to ${mailOptions.to} via Resend`);
+            console.log(`[Email] Message ID: ${messageId || 'n/a'}`);
+            return { delivered: true, provider: 'resend', messageId };
+        }
+
+        if (isSmtpConfigured()) {
+            console.log(`[Email] Attempting to send ${logLabel} to ${mailOptions.to} via SMTP...`);
+            const info = await transporter.sendMail(mailOptions);
+            console.log(`[Email SUCCESS] ${logLabel} sent to ${mailOptions.to} via SMTP`);
+            console.log(`[Email] Message ID: ${info.messageId}`);
+            return { delivered: true, provider: 'smtp', messageId: info.messageId };
+        }
+
+        throw new Error('No valid email provider is configured.');
     } catch (error) {
+        if (useResendProvider && isResendConfigured() && isSmtpConfigured()) {
+            try {
+                console.warn(`[Email] Resend failed for ${logLabel}. Falling back to SMTP...`);
+                const smtpInfo = await transporter.sendMail(mailOptions);
+                console.log(`[Email SUCCESS] ${logLabel} sent to ${mailOptions.to} via SMTP fallback`);
+                return { delivered: true, provider: 'smtp-fallback', messageId: smtpInfo.messageId };
+            } catch (fallbackError) {
+                console.error(`[Email] SMTP fallback also failed: ${fallbackError.message}`);
+            }
+        }
+
         console.error(`[Email FAILED] ${logLabel} failed to send to ${mailOptions.to}`);
         console.error(`[Email] Error details:`, error);
         console.error(`[Email] Error message: ${error.message}`);
         console.error(`[Email] Error code: ${error.code}`);
         if (error.response) {
-            console.error(`[Email] SMTP Response: ${error.response}`);
+            console.error(`[Email] Provider Response: ${error.response}`);
         }
         const fallbackPath = saveFallbackEmail(fallbackFileName, html);
         console.warn(`[Email] Preview saved to ${fallbackPath}`);
@@ -257,7 +315,7 @@ const sendOrderConfirmation = async (user, order) => {
         }
 
         if (!isEmailConfigured()) {
-            throw new Error('Email service is not configured. Set EMAIL_HOST, EMAIL_USER and EMAIL_PASS.');
+            throw new Error('Email service is not configured. Set RESEND_API_KEY (recommended) or SMTP EMAIL_HOST/EMAIL_USER/EMAIL_PASS.');
         }
 
         const orderId = getOrderId(order);
