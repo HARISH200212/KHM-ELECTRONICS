@@ -120,9 +120,19 @@ const maskEmail = (email) => {
 };
 
 const ensureVerificationEmailSent = async (user) => {
-    const rawToken = assignEmailVerificationToken(user);
-    await user.save();
-    await sendVerificationEmail(user, rawToken);
+    try {
+        console.log(`[VERIFICATION EMAIL] Preparing to send verification email to ${user.email}...`);
+        const rawToken = assignEmailVerificationToken(user);
+        await user.save();
+        console.log(`[VERIFICATION EMAIL] Token assigned and saved. Sending email...`);
+        const result = await sendVerificationEmail(user, rawToken);
+        console.log(`[VERIFICATION EMAIL] Result:`, result);
+        return result;
+    } catch (error) {
+        console.error(`[VERIFICATION EMAIL ERROR] Failed to send verification email:`, error);
+        console.error(`[VERIFICATION EMAIL ERROR] Stack:`, error.stack);
+        throw error;
+    }
 };
 
 // Initialize Twilio client conditionally
@@ -157,6 +167,7 @@ exports.register = async (req, res) => {
         const exist = await User.findOne({ email: normalizedEmail });
         if (exist) return res.status(400).json({ message: "Email already used" });
 
+        console.log(`[REGISTER] Creating user account for email: ${normalizedEmail}`);
         const user = await User.create({
             name,
             email: normalizedEmail,
@@ -165,8 +176,16 @@ exports.register = async (req, res) => {
             projectName,
             emailVerified: false,
         });
+        console.log(`[REGISTER] User created successfully: ${user._id}`);
 
-        await ensureVerificationEmailSent(user);
+        try {
+            console.log(`[REGISTER] Sending verification email...`);
+            await ensureVerificationEmailSent(user);
+            console.log(`[REGISTER] Verification email sent successfully`);
+        } catch (emailError) {
+            console.error(`[REGISTER] Verification email failed but account was created:`, emailError.message);
+            // Still return success - user can resend the email later
+        }
 
         res.status(201).json({
             user: serializeUserResponse(user),
@@ -174,8 +193,12 @@ exports.register = async (req, res) => {
             message: "Account created. Please verify your email before signing in."
         });
     } catch (err) {
-        console.error("Register error:", err);
-        res.status(500).json({ message: "Server error" });
+        console.error("[REGISTER] Register error:", err);
+        console.error("[REGISTER] Stack:", err.stack);
+        res.status(500).json({ 
+            message: "Server error during registration",
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
 };
 
@@ -324,24 +347,40 @@ exports.updateProfile = async (req, res) => {
 exports.resendVerificationEmail = async (req, res) => {
     try {
         const { email } = req.body || {};
+        console.log(`[RESEND VERIFICATION] Request received for email:`, email);
+        
         if (!email) {
-            return res.status(400).json({ message: "Email is required" });
+            console.warn(`[RESEND VERIFICATION] No email provided in request`);
+            return res.status(400).json({ success: false, message: "Email is required" });
         }
 
         const user = await User.findOne({ email: normalizeEmail(email) });
         if (!user) {
+            console.log(`[RESEND VERIFICATION] User not found for email: ${email}`);
             return res.json({ success: true, message: "If that account exists, a verification email has been sent." });
         }
 
+        console.log(`[RESEND VERIFICATION] User found:`, user.email);
+
         if (user.emailVerified) {
+            console.log(`[RESEND VERIFICATION] Email already verified for user: ${email}`);
             return res.json({ success: true, message: "That email address is already verified." });
         }
 
+        console.log(`[RESEND VERIFICATION] Ensuring verification email is sent...`);
         await ensureVerificationEmailSent(user);
-        return res.json({ success: true, message: "Verification email sent." });
+        
+        console.log(`[RESEND VERIFICATION] SUCCESS - Verification email sent to ${email}`);
+        return res.json({ success: true, message: "Verification email sent successfully." });
     } catch (err) {
-        console.error("Resend verification email error:", err);
-        return res.status(500).json({ message: "Failed to resend verification email" });
+        console.error(`[RESEND VERIFICATION ERROR] Exception occurred:`, err);
+        console.error(`[RESEND VERIFICATION ERROR] Message:`, err.message);
+        console.error(`[RESEND VERIFICATION ERROR] Stack:`, err.stack);
+        return res.status(500).json({ 
+            success: false,
+            message: "Failed to resend verification email. Please ensure your email service is configured correctly.",
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
 };
 

@@ -79,19 +79,29 @@ const saveFallbackEmail = (fileName, html) => {
 const sendMailWithFallback = async ({ mailOptions, fallbackFileName, html, logLabel }) => {
     if (!isEmailConfigured()) {
         const fallbackPath = saveFallbackEmail(fallbackFileName, html);
-        console.warn(`[Email] ${logLabel} not sent because email is not configured. Preview saved to ${fallbackPath}`);
+        console.error(`[Email ERROR] ${logLabel} not sent to ${mailOptions.to}. Email service NOT CONFIGURED.`);
+        console.error(`[Email DEBUG] EMAIL_FROM: ${senderAddress}, EMAIL_HOST: ${process.env.EMAIL_HOST}, EMAIL_USER: ${process.env.EMAIL_USER}`);
+        console.error(`[Email] Preview saved to ${fallbackPath}`);
         return { delivered: false, fallbackPath };
     }
 
     try {
-        await transporter.sendMail(mailOptions);
-        console.log(`[Email] ${logLabel} sent to ${mailOptions.to}`);
-        return { delivered: true };
+        console.log(`[Email] Attempting to send ${logLabel} to ${mailOptions.to}...`);
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`[Email SUCCESS] ${logLabel} sent to ${mailOptions.to}`);
+        console.log(`[Email] Message ID: ${info.messageId}`);
+        return { delivered: true, messageId: info.messageId };
     } catch (error) {
-        console.error(`[Email] ${logLabel} failed:`, error.message);
+        console.error(`[Email FAILED] ${logLabel} failed to send to ${mailOptions.to}`);
+        console.error(`[Email] Error details:`, error);
+        console.error(`[Email] Error message: ${error.message}`);
+        console.error(`[Email] Error code: ${error.code}`);
+        if (error.response) {
+            console.error(`[Email] SMTP Response: ${error.response}`);
+        }
         const fallbackPath = saveFallbackEmail(fallbackFileName, html);
         console.warn(`[Email] Preview saved to ${fallbackPath}`);
-        return { delivered: false, fallbackPath, error };
+        return { delivered: false, fallbackPath, error: error.message };
     }
 };
 
@@ -237,6 +247,15 @@ const sendAccountReminderEmail = async (user) => {
 
 const sendOrderConfirmation = async (user, order) => {
     try {
+        console.log(`\n[ORDER EMAIL] Starting order confirmation email process...`);
+        console.log(`[ORDER EMAIL] For user:`, { email: user?.email, name: user?.name });
+        console.log(`[ORDER EMAIL] Order ID: ${order?._id || order?.id}`);
+        
+        if (!user || !user.email) {
+            console.error(`[ORDER EMAIL ERROR] Missing user or user email. User:`, user);
+            throw new Error('User object or email is missing');
+        }
+
         if (!isEmailConfigured()) {
             throw new Error('Email service is not configured. Set EMAIL_HOST, EMAIL_USER and EMAIL_PASS.');
         }
@@ -291,7 +310,7 @@ const sendOrderConfirmation = async (user, order) => {
                         <tr>
                             <td width="50%" valign="top">
                                 <strong style="display: block; margin-bottom: 10px;">Send To</strong>
-                                <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Receiver Name:</strong> <span style="color: #333;">${user.name}</span></div>
+                                <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Receiver Name:</strong> <span style="color: #333;">${user.name || 'Valued Customer'}</span></div>
                                 <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Address:</strong> <span style="color: #333;">${order.shippingAddress?.address || order.customer?.address || 'N/A'}</span></div>
                                 <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Location:</strong> <span style="color: #333;">India</span></div>
                                 <div style="margin-bottom: 4px;"><strong style="display: inline-block; width: 140px;">Telephone / E-mail:</strong> <span style="color: #333;">${user.email}</span></div>
@@ -361,14 +380,19 @@ const sendOrderConfirmation = async (user, order) => {
             `,
         };
 
-        await sendMailWithFallback({
+        const result = await sendMailWithFallback({
             mailOptions,
             fallbackFileName: 'latest-order-invoice.html',
             html: mailOptions.html,
             logLabel: 'Order confirmation'
         });
+
+        console.log(`[ORDER EMAIL] Confirmation email result:`, result);
+        return result;
     } catch (err) {
-        console.error('Unexpected error generating order email template:', err);
+        console.error(`[ORDER EMAIL EXCEPTION] Unexpected error generating order email template:`, err);
+        console.error(`[ORDER EMAIL EXCEPTION] Stack:`, err.stack);
+        throw err;
     }
 };
 

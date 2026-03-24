@@ -42,7 +42,7 @@ exports.createOrder = async (req, res) => {
         const customerPhone = req.body.customer?.phone || (req.user && req.user.phone);
 
         if (customerEmail) {
-            // Send email to customer and BCC to given admin email instantly (non-blocking)
+            // Send email to customer and BCC to given admin email (non-blocking but log errors)
             notifyOrderPlacement(
                 { email: customerEmail, name: customerName, phone: customerPhone },
                 {
@@ -56,7 +56,16 @@ exports.createOrder = async (req, res) => {
                     createdAt: order.createdAt || new Date(),
                     paymentMethod: order.paymentMethod || 'Card'
                 }
-            ).catch(err => console.error("Immediate notification failed:", err));
+            ).catch(err => {
+                console.error("[ORDER] Email notification failed for order", order.id);
+                console.error("[ORDER] Error:", err.message);
+            });
+        } else {
+            console.warn(`[ORDER] No customer email provided. Email not sent. Body:`, { 
+                customerEmail,
+                bodyCustomer: req.body.customer,
+                userEmail: req.user?.email
+            });
         }
 
         // Emit a real-time event to all connected clients that a new order occurred and stock changed
